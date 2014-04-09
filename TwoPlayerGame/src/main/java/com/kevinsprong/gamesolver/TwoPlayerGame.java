@@ -32,18 +32,22 @@ public abstract class TwoPlayerGame {
     	// leave specific game implementations to set rest of fields
     }
     
-    // methods
+    
+    // abstract methods
     // given a game state, return gameEval
     public abstract int evaluateGameState(int[][] gameState);
     // given a game state, whose turn, and strats, return next game state
-    protected abstract int[][] playerMove(int[][] gameState, 
+    public abstract int[][] playerMove(int[][] gameState, 
     		int playerToMove, String p1Strat, String p2Strat);
     // given a move history, calculate the score
-    protected abstract int updateGameScore(int[][] gameState, String move, 
+    public abstract int updateGameScore(int[][] gameState, String move, 
     		int playerToMove);
     // given a gameState and whose turn it is, find list of legal moves
-    protected abstract String[] findLegalMoves(int[][] gameState, 
+    public abstract String[] findLegalMoves(int[][] gameState, 
     		int playerToMove);
+    // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
+    public abstract int determineWinner(int[][] gameState, int playerToMove);
+    
     
     // get/set methods here
     // get/set for p1MoveStrat
