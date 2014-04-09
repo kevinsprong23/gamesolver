@@ -17,10 +17,7 @@ public abstract class TwoPlayerGame {
     private double gameScore;  // score if game supports it
     private double moveNum = 0;
     private int gameWinner = 0;  // 1 or 2
-    // alpha beta solver values
-    private double alpha;
-    private double beta;
-    private String[] orderedMoveList; // this determined iddfs search order
+    // solver parameters
     private int searchPly;  // mutually exclusive with searchTime; defer to
     private int searchTime;  // constructor to set one to <N>, one to infinity
     
@@ -119,27 +116,6 @@ public abstract class TwoPlayerGame {
     }
     public void setGameWinner(int gameWinnerIn) {
             this.gameWinner= gameWinnerIn;
-    }
-    // get/set for alpha
-    public double getAlpha() {
-            return this.alpha;
-    }
-    public void setAlpha(double alphaIn) {
-            this.alpha= alphaIn;
-    }
-    // get/set for beta
-    public double getBeta() {
-            return this.beta;
-    }
-    public void setBeta(double betaIn) {
-            this.beta= betaIn;
-    }
-    // get/set for orderedMoveList
-    public String[] getOrderedMoveList() {
-            return this.orderedMoveList;
-    }
-    public void setOrderedMoveList(String[] orderedMoveListIn) {
-            this.orderedMoveList= orderedMoveListIn;
     }
     // get/set for searchPly
     public int getSearchPly() {
