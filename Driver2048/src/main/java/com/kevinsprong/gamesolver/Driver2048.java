@@ -18,8 +18,16 @@ public class Driver2048
     		game.playerMove();
     		game.updateGameState();	
     		winStatus = game.determineWinner();
+    		
+    		// debug printing
     		GameState gs = game.getGameState();
-    		System.out.println("Move " + gs.getMoveNum() + ", board:");
+    		String prevMove = null;
+    		if (gs.getPlayerToMove() == 2) { // since board has already been updated
+        		prevMove = gs.getP1PreviousMove();
+        	} else {
+        		prevMove = gs.getP2PreviousMove();
+        	}
+    		System.out.println("Move " + gs.getMoveNum() + ", " + prevMove + ", board:");
     		System.out.println(gs.getBoardState()[1]);
     		System.out.println(gs.getBoardState()[2]);
     		System.out.println(gs.getBoardState()[3]);

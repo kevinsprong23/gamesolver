@@ -88,8 +88,8 @@ public class TwoZeroFourEight extends TwoPlayerGame {
         }
         int pt1x = (randomNum1 % 4);
         int pt1y = randomNum1 / 4;
-        int pt2x = (randomNum1 % 4);
-        int pt2y = randomNum1 / 4;
+        int pt2x = (randomNum2 % 4);
+        int pt2y = randomNum2 / 4;
         
         // assign to game state
         int[][] currentBoard = gameState.getBoardState();
@@ -196,7 +196,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     			// move everything down into blank spots
     			for (int j = 0; j < 4; j++) { // each element will move down by the number of zeros above it
     				numZerosInPath = 0;
-    	    		for (int i = 3; i >= 0 ; i++) {
+    	    		for (int i = 3; i >= 0 ; i--) {
     	    			if (currentBoard[i][j] == 0) {
     	    				numZerosInPath++;
     	    			} else {
