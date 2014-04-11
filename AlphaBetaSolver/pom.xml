@@ -5,13 +5,19 @@
   <artifactId>AlphaBetaSolver</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>AlphaBetaPrune</name>
+  <name>AlphaBetaSolver</name>
   <url>kevinsprong.com</url>
+  <parent>
+    <groupId>com.kevinsprong</groupId>
+    <artifactId>gamesolver</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
   <dependencies>
     <dependency>
       <groupId>com.kevinsprong.gamesolver</groupId>
       <artifactId>TwoPlayerGame</artifactId>
       <version>1.0-SNAPSHOT</version>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
