@@ -1,5 +1,7 @@
 package com.kevinsprong.gamesolver;
 
+import java.util.Arrays;
+
 /*
  * Class to hold game state
  */
@@ -29,11 +31,9 @@ public class GameState {
     	
     	// need to duplicate values here otherwise pointer will be copied
     	int[][] boardOrig = gameStateIn.getBoardState();
-    	int[][] boardNew = new int[boardOrig.length][boardOrig[0].length];
+    	int[][] boardNew = new int[boardOrig.length][];
     	for (int i = 0; i < boardOrig.length; i++) {
-    		for (int j = 0; j < boardOrig[0].length; j++) {
-    			boardNew[i][j] = boardOrig[i][j];
-    		}
+    		boardNew[i] = Arrays.copyOf(boardOrig[i], boardOrig[i].length);
     	}
     	
     	gsOut.setBoardState(boardNew); 

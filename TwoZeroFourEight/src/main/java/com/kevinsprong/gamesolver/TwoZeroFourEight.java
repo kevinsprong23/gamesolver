@@ -19,11 +19,11 @@ public class TwoZeroFourEight extends TwoPlayerGame {
         this.setWinCondition(2048);
         
         // initialize game state
-    	GameState gameState = new GameState();
+    	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-        gameState.setBoardState(blankBoard);
-    	this.setGameState(gameState);
-    	
+        newGameState.setBoardState(blankBoard);
+    	this.setGameState(newGameState);
+ 	
     }
     
     public TwoZeroFourEight(String p1Strat, String p2Strat) {
@@ -35,10 +35,11 @@ public class TwoZeroFourEight extends TwoPlayerGame {
         this.setWinCondition(2048);
         
         // initialize game state
-    	GameState gameState = new GameState();
+    	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-        gameState.setBoardState(blankBoard);
-    	this.setGameState(gameState);
+        newGameState.setBoardState(blankBoard);
+    	this.setGameState(newGameState);
+    	
     }
     
     public TwoZeroFourEight(String p1Strat, String p2Strat, int searchPly, int searchTime) {
@@ -50,10 +51,10 @@ public class TwoZeroFourEight extends TwoPlayerGame {
         this.setWinCondition(2048);
         
         // initialize game state
-    	GameState gameState = new GameState();
+    	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-        gameState.setBoardState(blankBoard);
-    	this.setGameState(gameState);
+        newGameState.setBoardState(blankBoard);
+    	this.setGameState(newGameState);
     }
     
     public TwoZeroFourEight(String p1Strat, String p2Strat, 
@@ -66,10 +67,10 @@ public class TwoZeroFourEight extends TwoPlayerGame {
         this.setWinCondition(winCondition); // get to this number to win!
         
         // initialize game state
-    	GameState gameState = new GameState();
+    	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-        gameState.setBoardState(blankBoard);
-    	this.setGameState(gameState);
+        newGameState.setBoardState(blankBoard);
+    	this.setGameState(newGameState);
     }
     
     // implementation of abstract methods
@@ -166,13 +167,22 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     		// update depending on move
     		if (move.equals("U")) {
     			// detect and collapse
-    			for (int j = 0; j < 4; j++) {
-    	    		for (int i = 0; i < 3; i++) {
-    	    			if (currentBoard[i][j] == currentBoard[i+1][j]) {
-    	    				// assign 
-    	    				currentBoard[i][j] = currentBoard[i][j]*2;
-    	    				currentBoard[i+1][j] = 0;
-    	    			} 
+    			for (int j = 0; j < 4; j++) { // process each col independently
+    	    		for (int i = 0; i < 3; i++) {  // current tile to check
+    	    			for (int k = i+1; k < 4; k++) { // probe downwards 
+    	    				// break if you know condition can't be met
+    	    				if ((currentBoard[k][j] != currentBoard [i][j]) &&
+    	    						(currentBoard[k][j] != 0)) {
+    	    					break;
+    	    				} 
+    	    				// if there is a collision, assign it and break
+    	    				if (currentBoard[i][j] == currentBoard[k][j]) {
+    	    					// assign 
+    	    					currentBoard[i][j] = currentBoard[i][j]*2;
+    	    					currentBoard[k][j] = 0;
+    	    					break;
+    	    				} 
+    	    			}
     	    		}
     	    	}
     			// move everything up into blank spots
