@@ -75,7 +75,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     // implementation of abstract methods
     public void initializeBoard() {
     	
-    	GameState gameState = this.getGameState();
+    	GameState currentState = this.getGameState();
     	
     	// choose which numbers we will get
     	int pt1 = this.generateNewCell();
@@ -92,31 +92,33 @@ public class TwoZeroFourEight extends TwoPlayerGame {
         int pt2y = randomNum2 / 4;
         
         // assign to game state
-        int[][] currentBoard = gameState.getBoardState();
+        int[][] currentBoard = currentState.getBoardState();
         currentBoard[pt1y][pt1x] = pt1;
         currentBoard[pt2y][pt2x] = pt2;
-        gameState.setBoardState(currentBoard);
+        currentState.setBoardState(currentBoard);
         
-        this.setGameState(gameState);
+        this.setGameState(currentState);
     }
     
     // given a game state and strategies, return next player move
     public void playerMove() {
     	// get needed variables
-    	GameState gameState = this.getGameState();
+    	GameState currentState = this.getGameState();
     	String p1Strat = this.getP1MoveStrat();
     	String p2Strat = this.getP2MoveStrat();
     	
-    	if (gameState.getPlayerToMove() == 1) { // dont toggle flag until we actually update the board in other func
+    	if (currentState.getPlayerToMove() == 1) { // dont toggle flag until we actually update the board in other func
     		if (p1Strat.equals("AlphaBeta")) { // use AlphaBetaSolver
-    			gameState.setP1PreviousMove("U");
+    			currentState.setP1PreviousMove("U");
     		} else if (p1Strat.equals("Random")) {
+    			// copy game state so we dont overwrite any of it
+    			GameState currentStateCopy = GameState.copyGameState(currentState);
     			// pick a random legal move
-    			String[] legalMoves = this.findLegalMoves(gameState);
+    			String[] legalMoves = this.findLegalMoves(currentStateCopy);
     			int idx = this.randIntInRange(0, legalMoves.length - 1);
     			
     			// instead of return statement
-    			gameState.setP1PreviousMove(legalMoves[idx]);
+    			currentState.setP1PreviousMove(legalMoves[idx]);
     		}
     	} else {
     		if (p2Strat.equals("DefaultComputer")) { // choose a tile at random
@@ -124,7 +126,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	    	int pt1 = this.generateNewCell();
     	    	
     	    	// find zero tiles on current board and their indices
-    	    	int[][] currentBoard = gameState.getBoardState();
+    	    	int[][] currentBoard = currentState.getBoardState();
     	    	List<int[]> zeroList = new ArrayList<int[]>();
     	    	for (int i = 0; i < 4; i++) {
     	    		for (int j = 0; j < 4; j++) {
@@ -135,29 +137,31 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	    	}
     	    	
     	    	// choose random location for tile from among zero indices
-    	        int randomNum1 = this.randIntInRange(0, zeroList.size());
+    	        int randomNum1 = this.randIntInRange(0, zeroList.size()-1);
     	        int pt1y = zeroList.get(randomNum1)[0];
     	        int pt1x = zeroList.get(randomNum1)[1];
     	        
     	        // instead of return statement
-    	        gameState.setP2PreviousMove(Integer.toString(pt1) + "_" + Integer.toString(pt1y) + "_" + Integer.toString(pt1x));          
+    	        currentState.setP2PreviousMove(Integer.toString(pt1) + "_" + Integer.toString(pt1y) + "_" + Integer.toString(pt1x));          
     		}	
     	}
     	
     }
     
     // separate method to update game board of GameState manually
-    public GameState calcUpdatedGameState(GameState gameState, String move) {
+    public GameState calcUpdatedGameState(GameState gameStateIn, String move) {
     	
-    	int[][] currentBoard = gameState.getBoardState();
-    	int playerMoved = gameState.getPlayerToMove();
+    	// give ourselves clean object to work with
+    	GameState currentState = GameState.copyGameState(gameStateIn);
+    	
+    	int[][] currentBoard = currentState.getBoardState();
+    	int playerMoved = currentState.getPlayerToMove();
 
     	if (playerMoved == 1) {
     		
     		// create new board to handle collapsing
     		int [][] newBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
     		int numZerosInPath = 0; // will need this when collapsing moves
-    		int[] row = {0,0,0,0}; // only if L or R
     		
     		// update depending on move
     		if (move.equals("U")) {
@@ -194,7 +198,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	    		}
     	    	}
     			// move everything down into blank spots
-    			for (int j = 0; j < 4; j++) { // each element will move down by the number of zeros above it
+    			for (int j = 0; j < 4; j++) { // each element will move down by the number of zeros below it
     				numZerosInPath = 0;
     	    		for (int i = 3; i >= 0 ; i--) {
     	    			if (currentBoard[i][j] == 0) {
@@ -207,58 +211,50 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     		} else if (move.equals("L")) {
     			// detect and collapse
     			for (int i = 0; i < 4; i++) {
-    				row = currentBoard[i];
-    	    		for (int j = 0; j < 4; j++) {
-    	    			if (row[j] == row[j+1]) {
+    	    		for (int j = 0; j < 3; j++) {
+    	    			if (currentBoard[i][j] == currentBoard[i][j+1]) {
     	    				// assign 
-    	    				row[j] = row[j]*2;
-    	    				row[j+1] = 0;
+    	    				currentBoard[i][j] = currentBoard[i][j]*2;
+    	    				currentBoard[i][j+1] = 0;
     	    			} 
     	    		}
-    	    		newBoard[i] = row;
     	    	}
-    			// move everything left into blank spots
-    			for (int i = 0; i < 4; i++) {
+    			// move everything up into blank spots
+    			for (int i = 0; i < 4; i++) { 
     				numZerosInPath = 0;
-    				row = newBoard[0];
     	    		for (int j = 0; j < 4; j++) {
-    	    			if (row[j] == 0) {
+    	    			if (currentBoard[i][j] == 0) {
     	    				numZerosInPath++;
     	    			} else {
-    	    				row[j-numZerosInPath] = row[j];
+    	    				newBoard[i][j-numZerosInPath] = currentBoard[i][j];
     	    			}
     	    		}
-    	    		newBoard[i] = row;
     	    	}
     		} else if (move.equals("R")) {
     			// detect and collapse
     			for (int i = 0; i < 4; i++) {
-    				row = currentBoard[i];
-    	    		for (int j = 0; j < 4; j++) {
-    	    			if (row[j] == row[j-1]) {
+    	    		for (int j = 3; j > 0; j--) {
+    	    			if (currentBoard[i][j] == currentBoard[i][j-1]) {
     	    				// assign 
-    	    				row[j] = row[j]*2;
-    	    				row[j-1] = 0;
+    	    				currentBoard[i][j] = currentBoard[i][j]*2;
+    	    				currentBoard[i][j-1] = 0;
     	    			} 
     	    		}
-    	    		newBoard[i] = row;
     	    	}
-    			// move everything right into blank spots
-    			for (int i = 0; i < 4; i++) {
+    			// move everything up into blank spots
+    			for (int i = 0; i < 4; i++) { 
     				numZerosInPath = 0;
-    				row = newBoard[0];
     	    		for (int j = 3; j >= 0; j--) {
-    	    			if (row[j] == 0) {
+    	    			if (currentBoard[i][j] == 0) {
     	    				numZerosInPath++;
     	    			} else {
-    	    				row[j+numZerosInPath] = row[j];
+    	    				newBoard[i][j+numZerosInPath] = currentBoard[i][j];
     	    			}
     	    		}
-    	    		newBoard[i] = row;
     	    	}
-    		}
+    		} 
     		// assign new board back to game state
-    		gameState.setBoardState(newBoard);	
+    		currentState.setBoardState(newBoard);	
     		
     	} else {
     		
@@ -270,11 +266,11 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     		currentBoard[pt1y][pt1x] = pt1;
     		// assign it to the board
-    		gameState.setBoardState(currentBoard);	
+    		currentState.setBoardState(currentBoard);	
     		
     	}
     	
-        return gameState;
+        return currentState;
     }
     
     // given a move history, calculate the score
@@ -291,16 +287,14 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	GameState newGameState = calcUpdatedGameState(currentState, currentMove);
     	// switch playerToMove - flip 1 to 2 and vice versa
-    	newGameState.setPlayerToMove(((playerMoved + 1) % 2) + 1);
+    	newGameState.setPlayerToMove((playerMoved % 2) + 1);
     	// add a move to the overall list
     	if (playerMoved == 1) {
     		newGameState.setMoveNum(newGameState.getMoveNum() + 1);
     	}
     	// calc the move and update the official game state
     	this.setGameState(newGameState);
-    	
-    	
-    	
+	
     }
 
     // given a move history, calculate the score
@@ -309,28 +303,34 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     }
     
     // given a gameState and whose turn it is, find list of legal moves
-    public String[] findLegalMoves(GameState gameState) {
+    public String[] findLegalMoves(GameState gameStateIn) {
+    	GameState currentState = GameState.copyGameState(gameStateIn);
+    	
+    	int[][] boardOrig = currentState.getBoardState();
     	ArrayList<String> legalMoveList = new ArrayList<String>();
     	
     	// test each move individually
     	// test Up
-    	GameState gameStateU = this.calcUpdatedGameState(gameState, "U");
-    	if (checkBoardEquality(gameStateU, gameState)) {
+    	GameState gameStateU = this.calcUpdatedGameState(currentState, "U");
+    	if (!checkBoardEquality(gameStateU, currentState)) { // then up was a legal move
     		legalMoveList.add("U");
     	}
     	// test Down
-    	GameState gameStateD = this.calcUpdatedGameState(gameState, "D");
-    	if (checkBoardEquality(gameStateD, gameState)) {
+    	currentState.setBoardState(boardOrig);
+    	GameState gameStateD = this.calcUpdatedGameState(currentState, "D");
+    	if (!checkBoardEquality(gameStateD, currentState)) {
     		legalMoveList.add("D");
     	}
     	// test Left
-    	GameState gameStateL = this.calcUpdatedGameState(gameState, "L");
-    	if (checkBoardEquality(gameStateL, gameState)) {
+    	currentState.setBoardState(boardOrig);
+    	GameState gameStateL = this.calcUpdatedGameState(currentState, "L");
+    	if (!checkBoardEquality(gameStateL, currentState)) {
     		legalMoveList.add("L");
     	}
     	// test Right
-    	GameState gameStateR = this.calcUpdatedGameState(gameState, "R");
-    	if (checkBoardEquality(gameStateR, gameState)) {
+    	currentState.setBoardState(boardOrig);
+    	GameState gameStateR = this.calcUpdatedGameState(currentState, "R");
+    	if (!checkBoardEquality(gameStateR, currentState)) {
     		legalMoveList.add("R");
     	}
     	
@@ -340,15 +340,15 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     
     // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
     public int determineWinner() {
-    	GameState gameState = this.getGameState();
-    	
+    	GameState currentState = GameState.copyGameState(this.getGameState());
+
     	// check loser first
-    	if (gameState.getPlayerToMove() == 1 && this.findLegalMoves(gameState).length == 0) {
+     	if (currentState.getPlayerToMove() == 1 && this.findLegalMoves(currentState).length == 0) {
     		return 2;
     	}
     	
     	// find max tile on board
-    	int[][] currentBoard = gameState.getBoardState();
+    	int[][] currentBoard = currentState.getBoardState();
     	int maxTile = 0;
     	for (int i = 0; i < 4; i++) {
     		for (int j = 0; j < 4; j++) {
@@ -366,7 +366,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     }
     
     // compute board evaluation
-    public double evaluateGameState(GameState gameState) {
+    public double evaluateGameState(GameState gameStateIn) {
     	return 0;
     }
     
