@@ -10,6 +10,7 @@ public abstract class TwoPlayerGame {
     private String p2MoveStrat;
     private GameState gameState;
     private int gameWinner = 0;  // 1 or 2
+    
     // solver parameters
     private int searchPly;  // mutually exclusive with searchTime; defer to
     private int searchTime;  // constructor to set one to <N>, one to infinity
@@ -30,17 +31,17 @@ public abstract class TwoPlayerGame {
     
     // abstract methods
     // initialize board (to avoid having to do it in constructor
-    public abstract GameState initializeBoard(GameState gameState);
-    // given a game state and strategies, return next move
-    public abstract String playerMove(GameState gameState, String p1Strat, String p2Strat);
-    // update board after move
-    public abstract GameState updateGameState(GameState gameState, String move);
+    public abstract void initializeBoard();
+    // given a game state, whose turn, and strategies, make next move
+    public abstract void playerMove();
+    // update official board after move
+    public abstract void updateGameState();
     // given a move history, calculate the score
-    public abstract double updateGameScore(GameState gameState, String move);
+    public abstract void updateGameScore();
     // given a gameState and whose turn it is, find list of legal moves
     public abstract String[] findLegalMoves(GameState gameState);
     // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
-    public abstract int determineWinner(GameState gameState);
+    public abstract int determineWinner();
     // compute board evaluation
     public abstract double evaluateGameState(GameState gameState);
     
@@ -94,7 +95,6 @@ public abstract class TwoPlayerGame {
   	public void setWinCondition(int winConditionIn) {
   		this.winCondition= winConditionIn;
   	}
-
 }
 
 
