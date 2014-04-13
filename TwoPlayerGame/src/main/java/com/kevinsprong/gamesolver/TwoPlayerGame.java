@@ -36,8 +36,6 @@ public abstract class TwoPlayerGame {
     public abstract void playerMove();
     // update official board after move
     public abstract void updateGameState();
-    // given a move history, calculate the score
-    public abstract void updateGameScore();
     // given a gameState and whose turn it is, find list of legal moves
     public abstract String[] findLegalMoves(GameState gameState);
     // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2

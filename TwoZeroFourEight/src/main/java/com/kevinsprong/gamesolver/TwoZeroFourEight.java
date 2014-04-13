@@ -110,7 +110,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	if (currentState.getPlayerToMove() == 1) { // dont toggle flag until we actually update the board in other func
     		if (p1Strat.equals("AlphaBeta")) { // use AlphaBetaSolver
-    			currentState.setP1PreviousMove("U");
+    			currentState.setP1PreviousMove("L");
     		} else if (p1Strat.equals("Random")) {
     			// copy game state so we dont overwrite any of it
     			GameState currentStateCopy = GameState.copyGameState(currentState);
@@ -180,6 +180,8 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	    					// assign 
     	    					currentBoard[i][j] = currentBoard[i][j]*2;
     	    					currentBoard[k][j] = 0;
+    	    					// update score
+    	    					updateGameScore(currentState, currentBoard[i][j]);
     	    					break;
     	    				} 
     	    			}
@@ -200,11 +202,22 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     			// detect and collapse
     			for (int j = 0; j < 4; j++) {
     	    		for (int i = 3; i > 0; i--) {
-    	    			if (currentBoard[i][j] == currentBoard[i-1][j]) {
-    	    				// assign 
-    	    				currentBoard[i][j] = currentBoard[i][j]*2;
-    	    				currentBoard[i-1][j] = 0;
-    	    			} 
+    	    			for (int k = i-1; k >=0; k--) { // probe upwards 
+    	    				// break if you know condition can't be met
+    	    				if ((currentBoard[k][j] != currentBoard [i][j]) &&
+    	    						(currentBoard[k][j] != 0)) {
+    	    					break;
+    	    				} 
+    	    				// if there is a collision, assign it and break
+    	    				if (currentBoard[i][j] == currentBoard[k][j]) {
+    	    					// assign 
+    	    					currentBoard[i][j] = currentBoard[i][j]*2;
+    	    					currentBoard[k][j] = 0;
+    	    					// update score
+    	    					updateGameScore(currentState, currentBoard[i][j]);
+    	    					break;
+    	    				} 
+    	    			}
     	    		}
     	    	}
     			// move everything down into blank spots
@@ -222,11 +235,22 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     			// detect and collapse
     			for (int i = 0; i < 4; i++) {
     	    		for (int j = 0; j < 3; j++) {
-    	    			if (currentBoard[i][j] == currentBoard[i][j+1]) {
-    	    				// assign 
-    	    				currentBoard[i][j] = currentBoard[i][j]*2;
-    	    				currentBoard[i][j+1] = 0;
-    	    			} 
+    	    			for (int k = j+1; k < 4; k++) { // probe rightwards 
+    	    				// break if you know condition can't be met
+    	    				if ((currentBoard[i][k] != currentBoard [i][j]) &&
+    	    						(currentBoard[i][k] != 0)) {
+    	    					break;
+    	    				} 
+    	    				// if there is a collision, assign it and break
+    	    				if (currentBoard[i][j] == currentBoard[i][k]) {
+    	    					// assign 
+    	    					currentBoard[i][j] = currentBoard[i][j]*2;
+    	    					currentBoard[i][k] = 0;
+    	    					// update score
+    	    					updateGameScore(currentState, currentBoard[i][j]);
+    	    					break;
+    	    				} 
+    	    			}
     	    		}
     	    	}
     			// move everything up into blank spots
@@ -244,11 +268,22 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     			// detect and collapse
     			for (int i = 0; i < 4; i++) {
     	    		for (int j = 3; j > 0; j--) {
-    	    			if (currentBoard[i][j] == currentBoard[i][j-1]) {
-    	    				// assign 
-    	    				currentBoard[i][j] = currentBoard[i][j]*2;
-    	    				currentBoard[i][j-1] = 0;
-    	    			} 
+    	    			for (int k = j-1; k >=0; k--) { // probe leftwards
+    	    				// break if you know condition can't be met
+    	    				if ((currentBoard[i][k] != currentBoard [i][j]) &&
+    	    						(currentBoard[i][k] != 0)) {
+    	    					break;
+    	    				} 
+    	    				// if there is a collision, assign it and break
+    	    				if (currentBoard[i][j] == currentBoard[i][k]) {
+    	    					// assign 
+    	    					currentBoard[i][j] = currentBoard[i][j]*2;
+    	    					currentBoard[i][k] = 0;
+    	    					// update score
+    	    					updateGameScore(currentState, currentBoard[i][j]);
+    	    					break;
+    	    				} 
+    	    			}
     	    		}
     	    	}
     			// move everything up into blank spots
@@ -283,7 +318,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
         return currentState;
     }
     
-    // given a move history, calculate the score
+    // wrapper function for calculating updated game state 
     public void updateGameState() {
     	// get game variables we need
     	GameState currentState = this.getGameState();
@@ -294,7 +329,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	} else {
     		currentMove = currentState.getP2PreviousMove();
     	}
-    	
+    	// this call calculates the updated board
     	GameState newGameState = calcUpdatedGameState(currentState, currentMove);
     	// switch playerToMove - flip 1 to 2 and vice versa
     	newGameState.setPlayerToMove((playerMoved % 2) + 1);
@@ -302,17 +337,30 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	if (playerMoved == 1) {
     		newGameState.setMoveNum(newGameState.getMoveNum() + 1);
     	}
-    	// calc the move and update the official game state
+    	// calculate the move and update the official game state
     	this.setGameState(newGameState);
 	
     }
 
     // given a move history, calculate the score
-    public void updateGameScore() {
-    	// implement this later
+    public void updateGameScore(GameState currentState, int tileMade) {
+    	// formula:  making tile 2^n gives score (n-1)*2^n
+        // extract n
+    	double base = logb(tileMade, 2); // should be an int here anyways
+        int n = (int) Math.round(base);
+        // calc the score
+        int tileScore = (int) ((n - 1) * Math.pow(2, n));
+        
+    	// modify currentState that we are pointing to
+    	currentState.setGameScore(currentState.getGameScore() + tileScore);
     }
     
-    // given a gameState and whose turn it is, find list of legal moves
+    private double logb(int a, int b) {
+    	// return base b logarithm of a
+		return Math.log(a)/Math.log(b);
+	}
+
+	// given a gameState and whose turn it is, find list of legal moves
     public String[] findLegalMoves(GameState gameStateIn) {
     	GameState currentState = GameState.copyGameState(gameStateIn);
     	
@@ -353,7 +401,11 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	GameState currentState = GameState.copyGameState(this.getGameState());
 
     	// check loser first
-     	if (currentState.getPlayerToMove() == 1 && this.findLegalMoves(currentState).length == 0) {
+     	if (currentState.getPlayerToMove() == 1 && 
+     			this.findLegalMoves(currentState).length == 0) {
+     		// can do this first since getting to p1's win condition 
+     		// requires a successful move which leaves at least one empty space 
+     		// (conditions don't overlap)
     		return 2;
     	}
     	
@@ -372,6 +424,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     		return 1;
     	}
     	
+    	// if neither then p1 is still alive
     	return 0;
     }
     

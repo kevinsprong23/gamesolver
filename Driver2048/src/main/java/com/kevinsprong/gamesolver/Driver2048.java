@@ -12,7 +12,7 @@ public class Driver2048
         // make a new game
     	TwoZeroFourEight game = new TwoZeroFourEight("Random", "DefaultComputer");
     	game.initializeBoard();
-    	//int[][] debugMove = {{0,0,0,0},{0,0,2,0},{0,2,0,0},{0,0,0,0}};
+    	//int[][] debugMove = {{0,0,0,0},{2,2,0,0},{8,128,0,16},{4,4,8,4}};
     	
     	// debug printing
 		GameState gs = game.getGameState();
@@ -51,5 +51,8 @@ public class Driver2048
     		System.out.println(Arrays.toString(gs.getBoardState()[2]));
     		System.out.println(Arrays.toString(gs.getBoardState()[3]));
     	}
+    	
+    	System.out.println("Player " + winStatus + " wins!  Final Score " + 
+    				game.getGameState().getGameScore());
     }
 }
