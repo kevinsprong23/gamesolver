@@ -34,14 +34,16 @@ public abstract class TwoPlayerGame {
     public abstract void initializeBoard();
     // given a game state, whose turn, and strategies, make next move
     public abstract void playerMove();
+    // calculate the new board resulting from a move on a given game state
+    public abstract GameState calcUpdatedGameState(GameState gsIn, String move);
     // update official board after move
     public abstract void updateGameState();
     // given a gameState and whose turn it is, find list of legal moves
-    public abstract String[] findLegalMoves(GameState gameState);
+    public abstract String[] findLegalMoves(GameState gsIn);
     // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
     public abstract int determineWinner();
     // compute board evaluation
-    public abstract double evaluateGameState(GameState gameState);
+    public abstract double evaluateGameState(GameState gsIn);
     
     
     // get/set for p1MoveStrat

@@ -14,8 +14,8 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	this.setP1MoveStrat("AlphaBeta");
     	this.setP2MoveStrat("DefaultComputer");
     	// solver parameters
-        this.setSearchPly(0);  
-        this.setSearchTime(100);  // milliseconds
+    	this.setSearchPly(6);  
+        this.setSearchTime(10000);  // milliseconds
         this.setWinCondition(2048);
         
         // initialize game state
@@ -30,8 +30,8 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	this.setP1MoveStrat(p1Strat);
     	this.setP2MoveStrat(p2Strat);
     	// solver parameters
-        this.setSearchPly(0);  
-        this.setSearchTime(100);  // milliseconds
+        this.setSearchPly(6);  
+        this.setSearchTime(10000);  // milliseconds
         this.setWinCondition(2048);
         
         // initialize game state
@@ -367,31 +367,55 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	int[][] boardOrig = currentState.getBoardState();
     	ArrayList<String> legalMoveList = new ArrayList<String>();
     	
-    	// test each move individually
-    	// test Up
-    	GameState gameStateU = this.calcUpdatedGameState(currentState, "U");
-    	if (!checkBoardEquality(gameStateU, currentState)) { // then up was a legal move
-    		legalMoveList.add("U");
+    	if (currentState.getPlayerToMove() == 1) {
+    		// test each move individually
+    		// test Up
+    		GameState gameStateU = this.calcUpdatedGameState(currentState, "U");
+    		if (!checkBoardEquality(gameStateU, currentState)) { // then up was a legal move
+    			legalMoveList.add("U");
+    		}
+    		// test Down
+    		currentState.setBoardState(boardOrig);
+    		GameState gameStateD = this.calcUpdatedGameState(currentState, "D");
+    		if (!checkBoardEquality(gameStateD, currentState)) {
+    			legalMoveList.add("D");
+    		}
+    		// test Left
+    		currentState.setBoardState(boardOrig);
+    		GameState gameStateL = this.calcUpdatedGameState(currentState, "L");
+    		if (!checkBoardEquality(gameStateL, currentState)) {
+    			legalMoveList.add("L");
+    		}
+    		// test Right
+    		currentState.setBoardState(boardOrig);
+    		GameState gameStateR = this.calcUpdatedGameState(currentState, "R");
+    		if (!checkBoardEquality(gameStateR, currentState)) {
+    			legalMoveList.add("R");
+    		}
+    		
+    	} else { // computer player; legal moves are 4 and 2 to any open space
+    		
+    		// get indices of open spaces
+    		List<int[]> zeroList = new ArrayList<int[]>();
+	    	for (int i = 0; i < 4; i++) {
+	    		for (int j = 0; j < 4; j++) {
+	    			if (boardOrig[i][j] == 0) {
+	    				zeroList.add(new int[]{i, j});
+	    			}
+	    		}
+	    	}
+	    	// legal moves are 2 and 4
+	    	int[] legalMoveTiles = {2, 4};
+	    	// build list of moves
+	    	for (int tile : legalMoveTiles) {
+	    		for (int[] pos : zeroList) {
+	    			legalMoveList.add(Integer.toString(tile) + "_" + 
+	    					Integer.toString(pos[0]) + "_" + 
+	    					Integer.toString(pos[1]));
+	    		}
+	    	}
     	}
-    	// test Down
-    	currentState.setBoardState(boardOrig);
-    	GameState gameStateD = this.calcUpdatedGameState(currentState, "D");
-    	if (!checkBoardEquality(gameStateD, currentState)) {
-    		legalMoveList.add("D");
-    	}
-    	// test Left
-    	currentState.setBoardState(boardOrig);
-    	GameState gameStateL = this.calcUpdatedGameState(currentState, "L");
-    	if (!checkBoardEquality(gameStateL, currentState)) {
-    		legalMoveList.add("L");
-    	}
-    	// test Right
-    	currentState.setBoardState(boardOrig);
-    	GameState gameStateR = this.calcUpdatedGameState(currentState, "R");
-    	if (!checkBoardEquality(gameStateR, currentState)) {
-    		legalMoveList.add("R");
-    	}
-    	
+
     	// convert array list into array of strings
     	return legalMoveList.toArray(new String[legalMoveList.size()]);
     }
