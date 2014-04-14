@@ -344,15 +344,10 @@ public class TwoZeroFourEight extends TwoPlayerGame {
 
     // given a move history, calculate the score
     public void updateGameScore(GameState currentState, int tileMade) {
-    	// formula:  making tile 2^n gives score (n-1)*2^n
-        // extract n
-    	double base = logb(tileMade, 2); // should be an int here anyways
-        int n = (int) Math.round(base);
-        // calc the score
-        int tileScore = (int) ((n - 1) * Math.pow(2, n));
-        
+    	// n points for making tile n
+    	
     	// modify currentState that we are pointing to
-    	currentState.setGameScore(currentState.getGameScore() + tileScore);
+    	currentState.setGameScore(currentState.getGameScore() + tileMade);
     }
     
     private double logb(int a, int b) {
@@ -462,12 +457,12 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	// heuristics to assess board.  SCORE IS RELATIVE TO HUMAN PLAYER
     	double[] heuristicVals = {0, 0, 0, 0};
-    	double[] heuristicWeights = {500000, 0.01, 0.01, 10};
+    	double[] heuristicWeights = {500000, 0.005, 0.2, 1500};
     	double finalScore = 0;
     	
     	//---------------------------------------------------------------------
     	// Heuristic 1:  there is a win condition
-    	int winStatus = this.determineWinner();
+    	int winStatus = this.determineWinner(gameStateIn);
     	if (winStatus == 1) {
     		heuristicVals[0] = 1;
     	} else if (winStatus == 2) {
@@ -508,8 +503,8 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	double thisDeviation;
     	for (int i = 0; i < 4; i++) {
     		for (int j = 0; j < 4; j++) {
-    			thisDeviation = Double.POSITIVE_INFINITY;
     			if (board[i][j] != 0) {
+    				thisDeviation = Double.POSITIVE_INFINITY;
     				if (j+1 < 4) { // include rightward deviation
     					thisDeviation = Math.min(thisDeviation, 
     							Math.abs(board[i][j] - board[i][j+1]));
@@ -526,8 +521,8 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     					thisDeviation = Math.min(thisDeviation, 
     							Math.abs(board[i][j] - board[i-1][j]));
     				}
-    			}
-    			totalDeviation += thisDeviation;
+    				totalDeviation += thisDeviation;
+    			}	
     		}
     	}   	
     	heuristicVals[2] = -1 * totalDeviation;
@@ -535,6 +530,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	//---------------------------------------------------------------------
     	// Heuristic 4:  the number of open tiles
+
     	double openTiles = 0;
     	for (int i = 0; i < 4; i++) {
     		for (int j = 0; j < 4; j++) {

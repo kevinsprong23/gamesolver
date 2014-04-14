@@ -13,20 +13,18 @@ public class AlphaBetaSolver {
 	//										evaluateGameState
 			
 	public static String solveBoard(TwoPlayerGame game) {
-		String bestMove = null;
+		String bestMove = "";
 		
 		// get the game state and solver parameters
 		GameState currentGameState = GameState.copyGameState(game.getGameState());
 		int searchPly = game.getSearchPly();
 		
 		MoveNode originNode = new MoveNode(currentGameState, searchPly);
-		originNode.setAlpha(Double.NEGATIVE_INFINITY);
-		originNode.setBeta(Double.POSITIVE_INFINITY);
 		double moveEval = alphaBeta(game, originNode, searchPly, true);
 		
 		// find the move that produced the best evaluation
 		for (MoveNode child : originNode.getNodeChildren()) {
-			if (child.getAlpha() == moveEval) {
+			if (child.getBeta() == moveEval) {
 				bestMove = child.getMoveName();
 				break;
 			}
@@ -45,9 +43,15 @@ public class AlphaBetaSolver {
 		// if searchPly is 0 or there is a winner, return game evaluation
 		if ((searchPly == 0) || 
 				(game.determineWinner(GameState.copyGameState(thisGS)) != 0) ){
-			return game.evaluateGameState(thisGS);
+			double eval = game.evaluateGameState(thisGS);
+			if (maximizingPlayer) {
+				thisNode.setAlpha(eval);
+			} else {
+				thisNode.setBeta(eval);
+			}
+			return eval;
 		}
-		
+
 		// else set up Node Tree for legal moves
 		GameState nextGS;
 		MoveNode newChild;
@@ -55,6 +59,7 @@ public class AlphaBetaSolver {
 		for (String move : legalMoves) {
 			nextGS = GameState.copyGameState(thisGS);
 			nextGS = game.calcUpdatedGameState(nextGS, move);
+			nextGS.setPlayerToMove((nextGS.getPlayerToMove() % 2) + 1);
 			newChild = new MoveNode(nextGS, searchPly-1, move);
 			thisNode.getNodeChildren().add(newChild);
 		}
