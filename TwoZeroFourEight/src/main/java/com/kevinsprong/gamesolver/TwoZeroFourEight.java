@@ -110,7 +110,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	if (currentState.getPlayerToMove() == 1) { // dont toggle flag until we actually update the board in other func
     		if (p1Strat.equals("AlphaBeta")) { // use AlphaBetaSolver
-    			currentState.setP1PreviousMove("L");
+    			currentState.setP1PreviousMove(AlphaBetaSolver.solveBoard(this));
     		} else if (p1Strat.equals("Random")) {
     			// copy game state so we dont overwrite any of it
     			GameState currentStateCopy = GameState.copyGameState(currentState);
@@ -424,15 +424,19 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     public int determineWinner() {
     	GameState currentState = GameState.copyGameState(this.getGameState());
 
+    	return this.determineWinner(currentState);
+    }
+    // with gs argument for alpha beta calls
+    public int determineWinner(GameState currentState) {
     	// check loser first
-     	if (currentState.getPlayerToMove() == 1 && 
-     			this.findLegalMoves(currentState).length == 0) {
-     		// can do this first since getting to p1's win condition 
-     		// requires a successful move which leaves at least one empty space 
-     		// (conditions don't overlap)
+    	if (currentState.getPlayerToMove() == 1 && 
+    			this.findLegalMoves(currentState).length == 0) {
+    		// can do this first since getting to p1's win condition 
+    		// requires a successful move which leaves at least one empty space 
+    		// (conditions don't overlap)
     		return 2;
     	}
-    	
+
     	// find max tile on board
     	int[][] currentBoard = currentState.getBoardState();
     	int maxTile = 0;
@@ -443,11 +447,11 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     			}
     		}
     	}
-    	
+
     	if (maxTile >= this.getWinCondition()) {
     		return 1;
     	}
-    	
+
     	// if neither then p1 is still alive
     	return 0;
     }
@@ -458,16 +462,18 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	// heuristics to assess board.  SCORE IS RELATIVE TO HUMAN PLAYER
     	double[] heuristicVals = {0, 0, 0, 0};
-    	double[] heuristicWeights = {5000, 0.01, 0.1, 10};
+    	double[] heuristicWeights = {500000, 0.01, 0.01, 10};
     	double finalScore = 0;
     	
     	//---------------------------------------------------------------------
     	// Heuristic 1:  there is a win condition
     	int winStatus = this.determineWinner();
     	if (winStatus == 1) {
-    		heuristicVals[0] = (double) 1;
+    		heuristicVals[0] = 1;
+    	} else if (winStatus == 2) {
+    		heuristicVals[0] = -1;
     	} else {
-    		heuristicVals[0] = (double) -1;
+    		heuristicVals[0] = 0;
     	}
     	
     	//---------------------------------------------------------------------
@@ -493,24 +499,38 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     		reverseScore = vectormult(col, reverseMatchFilt);
     		totalScore += Math.max(forwardScore, reverseScore);
     	}
-    	heuristicVals[2] = (double) totalScore;
+    	heuristicVals[1] = (double) totalScore;
     	
     	
     	//---------------------------------------------------------------------
     	// Heuristic 3:  the "smoothness" of the board
-    	int totalDeviation = 0;  // will be negative to penalize deviation
+    	double totalDeviation = 0;  // will be negative to penalize deviation
+    	double thisDeviation;
     	for (int i = 0; i < 4; i++) {
     		for (int j = 0; j < 4; j++) {
-    			// only need to check rightwards and downwards for everyone
-    			if (j + 1 < 4) { // include rightward deviation
-    				totalDeviation -= Math.abs(board[i][j] - board[i][j+1]);
+    			thisDeviation = Double.POSITIVE_INFINITY;
+    			if (board[i][j] != 0) {
+    				if (j+1 < 4) { // include rightward deviation
+    					thisDeviation = Math.min(thisDeviation, 
+    							Math.abs(board[i][j] - board[i][j+1]));
+    				}
+    				if (j-1 >= 0) { // include leftward deviation
+    					thisDeviation = Math.min(thisDeviation, 
+    							Math.abs(board[i][j] - board[i][j-1]));
+    				}
+    				if (i+1 < 4) { // include upward deviation
+    					thisDeviation = Math.min(thisDeviation, 
+    							Math.abs(board[i][j] - board[i+1][j]));
+    				}
+    				if (i-1 >= 0) { // include downward deviation
+    					thisDeviation = Math.min(thisDeviation, 
+    							Math.abs(board[i][j] - board[i-1][j]));
+    				}
     			}
-    			if (i + 1 < 4) { // include downward deviation
-    				totalDeviation -= Math.abs(board[i][j] - board[i+1][j]);
-    			}
+    			totalDeviation += thisDeviation;
     		}
     	}   	
-    	heuristicVals[3] = (double) totalDeviation;
+    	heuristicVals[2] = -1 * totalDeviation;
     	
     	
     	//---------------------------------------------------------------------
@@ -523,13 +543,13 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     			}
     		}
     	}
-    	heuristicVals[4] = openTiles;
+    	heuristicVals[3] = openTiles;
     	
     	
     	//---------------------------------------------------------------------
     	// aggregate and return
     	for (int i = 0; i < 4; i++) {
-    		finalScore += heuristicVals[i]*heuristicWeights[i];
+    		finalScore += heuristicVals[i] * heuristicWeights[i];
     	}
     	return finalScore;
     }

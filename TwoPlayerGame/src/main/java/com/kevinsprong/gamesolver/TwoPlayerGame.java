@@ -42,6 +42,8 @@ public abstract class TwoPlayerGame {
     public abstract String[] findLegalMoves(GameState gsIn);
     // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
     public abstract int determineWinner();
+ // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
+    public abstract int determineWinner(GameState gsIn);
     // compute board evaluation
     public abstract double evaluateGameState(GameState gsIn);
     

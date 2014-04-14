@@ -20,8 +20,9 @@ public class AlphaBetaSolver {
 		int searchPly = game.getSearchPly();
 		
 		MoveNode originNode = new MoveNode(currentGameState, searchPly);
-		double moveEval = alphaBeta(game, originNode, searchPly,
-				Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, true);
+		originNode.setAlpha(Double.NEGATIVE_INFINITY);
+		originNode.setBeta(Double.POSITIVE_INFINITY);
+		double moveEval = alphaBeta(game, originNode, searchPly, true);
 		
 		// find the move that produced the best evaluation
 		for (MoveNode child : originNode.getNodeChildren()) {
@@ -36,27 +37,21 @@ public class AlphaBetaSolver {
 	}
 	
 	private static double alphaBeta(TwoPlayerGame game, MoveNode thisNode, 
-			int searchPly, double alpha, double beta, 
-			boolean maximizingPlayer) {
+			int searchPly, boolean maximizingPlayer) {
 		
 		// get the moveNode's game state
 		GameState thisGS = thisNode.getNodeGameState();
 		
-		// if searchPly is 0, return current game evaluation
-		if (searchPly == 0) {
-			return game.evaluateGameState(thisGS);
-		}
-		// find legal moves
-		String[] legalMoves = game.findLegalMoves(thisGS);
-		
-		// if none, return current game evaluation
-		if (legalMoves.length == 0) {
+		// if searchPly is 0 or there is a winner, return game evaluation
+		if ((searchPly == 0) || 
+				(game.determineWinner(GameState.copyGameState(thisGS)) != 0) ){
 			return game.evaluateGameState(thisGS);
 		}
 		
 		// else set up Node Tree for legal moves
 		GameState nextGS;
 		MoveNode newChild;
+		String[] legalMoves = game.findLegalMoves(thisGS);
 		for (String move : legalMoves) {
 			nextGS = GameState.copyGameState(thisGS);
 			nextGS = game.calcUpdatedGameState(nextGS, move);
@@ -64,11 +59,17 @@ public class AlphaBetaSolver {
 			thisNode.getNodeChildren().add(newChild);
 		}
 		
+		// get alpha and beta
+		double alpha = thisNode.getAlpha();
+		double beta = thisNode.getBeta();
+		
 		// loop over children and return 
 		if (maximizingPlayer) {
 			for (MoveNode child : thisNode.getNodeChildren()) {
-				alpha = Math.max(alpha, alphaBeta(game, child, searchPly-1, 
-						alpha, beta, false));
+				child.setAlpha(thisNode.getAlpha());
+				child.setBeta(thisNode.getBeta());
+				alpha = Math.max(alpha, alphaBeta(game, child, searchPly-1, false));
+				thisNode.setAlpha(alpha);
 				if (alpha >= beta) {
 					break;
 				}
@@ -76,8 +77,10 @@ public class AlphaBetaSolver {
 			return alpha;
 		} else { // minimizing player
 			for (MoveNode child : thisNode.getNodeChildren()) {
-				beta = Math.min(beta, alphaBeta(game, child, searchPly-1, 
-						alpha, beta, true));
+				child.setAlpha(thisNode.getAlpha());
+				child.setBeta(thisNode.getBeta());
+				beta = Math.min(beta, alphaBeta(game, child, searchPly-1,true));
+				thisNode.setBeta(beta);
 				if (alpha >= beta) {
 					break;
 				}

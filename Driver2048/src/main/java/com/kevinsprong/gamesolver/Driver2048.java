@@ -10,13 +10,13 @@ public class Driver2048
     public static void main( String[] args )
     {
         // make a new game
-    	TwoZeroFourEight game = new TwoZeroFourEight("Random", "DefaultComputer");
+    	TwoZeroFourEight game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
     	game.initializeBoard();
-    	//int[][] debugMove = {{0,0,0,0},{2,2,0,0},{8,128,0,16},{4,4,8,4}};
+    	int[][] testBoard = {{1024,512,256,128},{8,16,64,64},{8,0,0,0},{0,0,0,0}};
     	
     	// debug printing
 		GameState gs = game.getGameState();
-		//gs.setBoardState(debugMove);
+		gs.setBoardState(testBoard);
 		String prevMove = null;
 		if (gs.getPlayerToMove() == 2) { // since board has already been updated
     		prevMove = gs.getP1PreviousMove();
