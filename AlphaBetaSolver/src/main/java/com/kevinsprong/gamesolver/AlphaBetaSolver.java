@@ -1,7 +1,5 @@
 package com.kevinsprong.gamesolver;
 
-import java.util.ArrayList;
-
 /**
  * Module to perform Alpha Beta Pruning to find the next move in a TwoPlayerGame
  */
@@ -57,11 +55,35 @@ public class AlphaBetaSolver {
 		}
 		
 		// else set up Node Tree for legal moves
+		GameState nextGS;
+		MoveNode newChild;
+		for (String move : legalMoves) {
+			nextGS = GameState.copyGameState(thisGS);
+			nextGS = game.calcUpdatedGameState(nextGS, move);
+			newChild = new MoveNode(nextGS, searchPly-1, move);
+			thisNode.getNodeChildren().add(newChild);
+		}
 		
-		
-		
-		
-		return beta;
+		// loop over children and return 
+		if (maximizingPlayer) {
+			for (MoveNode child : thisNode.getNodeChildren()) {
+				alpha = Math.max(alpha, alphaBeta(game, child, searchPly-1, 
+						alpha, beta, false));
+				if (alpha >= beta) {
+					break;
+				}
+			}	
+			return alpha;
+		} else { // minimizing player
+			for (MoveNode child : thisNode.getNodeChildren()) {
+				beta = Math.min(beta, alphaBeta(game, child, searchPly-1, 
+						alpha, beta, true));
+				if (alpha >= beta) {
+					break;
+				}
+			}
+			return beta;
+		}
 
 	}
 

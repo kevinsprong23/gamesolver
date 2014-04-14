@@ -454,7 +454,84 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     
     // compute board evaluation
     public double evaluateGameState(GameState gameStateIn) {
-    	return 0;
+    	int[][] board = gameStateIn.getBoardState();
+    	
+    	// heuristics to assess board.  SCORE IS RELATIVE TO HUMAN PLAYER
+    	double[] heuristicVals = {0, 0, 0, 0};
+    	double[] heuristicWeights = {5000, 0.01, 0.1, 10};
+    	double finalScore = 0;
+    	
+    	//---------------------------------------------------------------------
+    	// Heuristic 1:  there is a win condition
+    	int winStatus = this.determineWinner();
+    	if (winStatus == 1) {
+    		heuristicVals[0] = (double) 1;
+    	} else {
+    		heuristicVals[0] = (double) -1;
+    	}
+    	
+    	//---------------------------------------------------------------------
+    	// Heuristic 2:  monotonicity
+    	int[] forwardMatchFilt = {1, 2, 4, 8};
+    	int[] reverseMatchFilt = {8, 4, 2, 1};
+    	int forwardScore = 0;
+    	int reverseScore = 0;
+    	int totalScore = 0;
+    	// loop over rows
+    	for (int[] row : board) {
+    		forwardScore = vectormult(row, forwardMatchFilt);
+    		reverseScore = vectormult(row, reverseMatchFilt);
+    		totalScore += Math.max(forwardScore, reverseScore);
+    	}
+    	// loop over cols
+    	int[] col = {0, 0, 0, 0};
+    	for (int j = 0; j < 4; j++) {
+    		for (int i = 0; i < 4; i++) {
+    			col[i] = board[i][j];
+    		}
+    		forwardScore = vectormult(col, forwardMatchFilt);
+    		reverseScore = vectormult(col, reverseMatchFilt);
+    		totalScore += Math.max(forwardScore, reverseScore);
+    	}
+    	heuristicVals[2] = (double) totalScore;
+    	
+    	
+    	//---------------------------------------------------------------------
+    	// Heuristic 3:  the "smoothness" of the board
+    	int totalDeviation = 0;  // will be negative to penalize deviation
+    	for (int i = 0; i < 4; i++) {
+    		for (int j = 0; j < 4; j++) {
+    			// only need to check rightwards and downwards for everyone
+    			if (j + 1 < 4) { // include rightward deviation
+    				totalDeviation -= Math.abs(board[i][j] - board[i][j+1]);
+    			}
+    			if (i + 1 < 4) { // include downward deviation
+    				totalDeviation -= Math.abs(board[i][j] - board[i+1][j]);
+    			}
+    		}
+    	}   	
+    	heuristicVals[3] = (double) totalDeviation;
+    	
+    	
+    	//---------------------------------------------------------------------
+    	// Heuristic 4:  the number of open tiles
+    	double openTiles = 0;
+    	for (int i = 0; i < 4; i++) {
+    		for (int j = 0; j < 4; j++) {
+    			if (board[i][j] == 0) {
+    				openTiles += 1;
+    			}
+    		}
+    	}
+    	heuristicVals[4] = openTiles;
+    	
+    	
+    	//---------------------------------------------------------------------
+    	// aggregate and return
+    	for (int i = 0; i < 4; i++) {
+    		finalScore += heuristicVals[i]*heuristicWeights[i];
+    	}
+    	return finalScore;
     }
     
     // generate new tile for the game
@@ -486,6 +563,17 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	}
     	
     	return boardEq;
+    }
+    
+    // vector multiply
+    public int vectormult(int[] a, int[] b) {
+    	int total = 0;
+    	
+    	for (int i = 0; i < a.length; i++) {
+    		total += a[i] * b[i];
+    	}
+    	
+    	return total;
     }
     
     // generate a random int in a range
