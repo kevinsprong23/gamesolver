@@ -12,13 +12,13 @@ import java.util.ArrayList;
 public class ParamOptimizer2048 {
     public static void main( String[] args ) throws IOException {
     	// num sims per parameter setting
-    	int numTrials = 10000;
+    	int numTrials = 10;
     	
     	// sim parameters
-    	double [] winRange = {0, 500, 25};
-    	double [] monoRange = {0, 10, 1};
-    	double [] smoothRange = {0, 10, 1};
-    	double [] openRange = {0, 10, 1};
+    	double [] winRange = {0, 500, 500};
+    	double [] monoRange =  {0, 10, 2};
+    	double [] smoothRange =  {0, 10, 2};
+    	double [] openRange =  {0, 10, 2};
     	ArrayList<Double> winVec = new ArrayList<Double>();
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();
@@ -64,17 +64,20 @@ public class ParamOptimizer2048 {
     							newline);
 
         // loop to optimize parameters
+    	long startTime = System.nanoTime();
     	int thisSetting = 0;
     	for (double wR : winVec) {
     		for (double mR : monoVec) {
     			for (double sR : smoothVec) {
     				for (double oR : openVec) {
     					thisSetting++;
-    					System.out.println(Double.toString(wR) + "," +
-    							Double.toString(mR) + "," +
-    							Double.toString(sR) + "," +
-    							Double.toString(oR) + "," +
-    							" Trial " + thisSetting + " of " + totalNumSettings);
+    					
+    					// prevent all zeros among non-win parameters
+    					if (mR == 0 && sR == 0 && oR == 0) {
+    						mR = 1;
+    						sR = 1;
+    						oR = 1;
+    					}		
     					
     					highestTile = 0;
     			    	winRecord = new int[numTrials];
@@ -82,6 +85,19 @@ public class ParamOptimizer2048 {
     			    	scores  = new int[numTrials];
     					
     					for (int k = 0; k < numTrials; k++) {
+    						
+    						System.out.println(Double.toString(wR) + ", " +
+        							Double.toString(mR) + ", " +
+        							Double.toString(sR) + ", " +
+        							Double.toString(oR) + ", " +
+        							" Setting " + thisSetting + 
+        							" of " + totalNumSettings + 
+        							", Trial " + Integer.toString(k+1));
+        					
+    						
+    						
+    						
+    						// create a new game
     						game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
     						game.setSearchPly(7);
     						game.setWinCondition(65536);
@@ -113,6 +129,7 @@ public class ParamOptimizer2048 {
     							winRecord[k] = 0;
     						}
     					}
+    					
     					// summarize trials and write to file
     					avgWinPct = calculateAverage(winRecord);
     					avgHighTile = calculateAverage(highTiles);
@@ -132,6 +149,10 @@ public class ParamOptimizer2048 {
     			}
     		}
     	}
+    	double elapsedTime = (double) (System.nanoTime() - startTime) / 1e9;
+    	System.out.println("Done!  Time Elapsed: " + 
+    			Double.toString(elapsedTime) + " s");
+    	
     	// close our writer
     	writer.close();
 

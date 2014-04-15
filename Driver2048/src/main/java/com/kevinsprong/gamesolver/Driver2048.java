@@ -11,7 +11,7 @@ public class Driver2048
     {
         // make a new game
     	TwoZeroFourEight game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
-    	game.setSearchPly(6);
+    	game.setSearchPly(7);
     	game.initializeBoard();
     	
     	// debug printing
