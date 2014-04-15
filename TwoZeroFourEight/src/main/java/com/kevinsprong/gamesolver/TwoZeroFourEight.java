@@ -8,6 +8,16 @@ import java.util.Random;
  * Extension of TwoPlayerGame to play the game 2048
  */
 public class TwoZeroFourEight extends TwoPlayerGame {
+	// expose weights for tuning
+	private double[] heuristicWeights = {5000, 1, 10, 5};
+	
+	// getter and setter
+	public double[] getHeuristicWeights() {
+		return this.heuristicWeights;
+	}
+	public void setHeuristicWeights(double[] heuristicWeightsIn) {
+		this.heuristicWeights = heuristicWeightsIn;
+	}
     
 	// constructors
     public TwoZeroFourEight() {
@@ -350,10 +360,6 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	currentState.setGameScore(currentState.getGameScore() + tileMade);
     }
     
-    private double logb(int a, int b) {
-    	// return base b logarithm of a
-		return Math.log(a)/Math.log(b);
-	}
 
 	// given a gameState and whose turn it is, find list of legal moves
     public String[] findLegalMoves(GameState gameStateIn) {
@@ -457,7 +463,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	// heuristics to assess board.  SCORE IS RELATIVE TO HUMAN PLAYER
     	double[] heuristicVals = {0, 0, 0, 0};
-    	double[] heuristicWeights = {500000, 0.005, 0.2, 1500};
+    	double[] heuristicWeights = this.getHeuristicWeights();
     	double finalScore = 0;
     	
     	//---------------------------------------------------------------------
@@ -473,61 +479,65 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	
     	//---------------------------------------------------------------------
     	// Heuristic 2:  monotonicity
-    	int[] forwardMatchFilt = {1, 2, 4, 8};
-    	int[] reverseMatchFilt = {8, 4, 2, 1};
-    	int forwardScore = 0;
-    	int reverseScore = 0;
+    	int[] monoScores;
     	int totalScore = 0;
     	// loop over rows
     	for (int[] row : board) {
-    		forwardScore = vectormult(row, forwardMatchFilt);
-    		reverseScore = vectormult(row, reverseMatchFilt);
-    		totalScore += Math.max(forwardScore, reverseScore);
+    		monoScores = checkMonotonicity(row);
+    		totalScore += Math.max(monoScores[0], monoScores[1]);
     	}
     	// loop over cols
-    	int[] col = {0, 0, 0, 0};
+    	int[] col = {0,0,0,0};
     	for (int j = 0; j < 4; j++) {
     		for (int i = 0; i < 4; i++) {
     			col[i] = board[i][j];
     		}
-    		forwardScore = vectormult(col, forwardMatchFilt);
-    		reverseScore = vectormult(col, reverseMatchFilt);
-    		totalScore += Math.max(forwardScore, reverseScore);
+    		monoScores = checkMonotonicity(col);
+    		totalScore += Math.max(monoScores[0], monoScores[1]);
     	}
+
     	heuristicVals[1] = (double) totalScore;
-    	
-    	
+
+
     	//---------------------------------------------------------------------
     	// Heuristic 3:  the "smoothness" of the board
+    	// in log space to account for merges needed
     	double totalDeviation = 0;  // will be negative to penalize deviation
-    	double thisDeviation;
+    	// probe rightwards 
     	for (int i = 0; i < 4; i++) {
-    		for (int j = 0; j < 4; j++) {
+    		for (int j = 0; j < 3; j++) {
     			if (board[i][j] != 0) {
-    				thisDeviation = Double.POSITIVE_INFINITY;
-    				if (j+1 < 4) { // include rightward deviation
-    					thisDeviation = Math.min(thisDeviation, 
-    							Math.abs(board[i][j] - board[i][j+1]));
-    				}
-    				if (j-1 >= 0) { // include leftward deviation
-    					thisDeviation = Math.min(thisDeviation, 
-    							Math.abs(board[i][j] - board[i][j-1]));
-    				}
-    				if (i+1 < 4) { // include upward deviation
-    					thisDeviation = Math.min(thisDeviation, 
-    							Math.abs(board[i][j] - board[i+1][j]));
-    				}
-    				if (i-1 >= 0) { // include downward deviation
-    					thisDeviation = Math.min(thisDeviation, 
-    							Math.abs(board[i][j] - board[i-1][j]));
-    				}
-    				totalDeviation += thisDeviation;
+    				// probe rightwards 
+    				for (int k = j+1; k < 4; k++) { 
+	    				// check smoothness versus first non-zero tile
+	    				if (board[i][k] != 0) {
+	    					totalDeviation += Math.abs(logb(board[i][j], 2) - 
+	    							logb(board[i][k], 2));
+	    					break;
+	    				}
+	    		    }   				
+    			}	
+    		}
+    	}   
+    	// probe downwards
+    	for (int j = 0; j < 4; j++) {
+    		for (int i = 0; i < 3; i++) {
+    			if (board[i][j] != 0) {
+    				// probe rightwards 
+    				for (int k = i+1; k < 4; k++) { 
+    					// check smoothness versus first non-zero tile
+    					if (board[k][j] != 0) {
+    						totalDeviation += Math.abs(logb(board[i][j], 2) - 
+    								logb(board[k][j], 2));
+    						break;
+    					}
+    				}   				
     			}	
     		}
     	}   	
     	heuristicVals[2] = -1 * totalDeviation;
-    	
-    	
+
+
     	//---------------------------------------------------------------------
     	// Heuristic 4:  the number of open tiles
 
@@ -539,7 +549,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     			}
     		}
     	}
-    	heuristicVals[3] = openTiles;
+    	heuristicVals[3] = Math.pow(openTiles, 2);
     	
     	
     	//---------------------------------------------------------------------
@@ -550,7 +560,29 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	return finalScore;
     }
     
-    // generate new tile for the game
+    // check monotonicity of a vector in log space ignoring zeros
+    private int[] checkMonotonicity(int[] vec) {
+    	int[] scores = {0,0}; // forward and reverse dir respectively
+		for (int i = 0; i < vec.length-1; i++) {
+			if (vec[i] > 0) {
+				// find next non-zero element
+				for (int j = i+1; j < vec.length; j++) {
+					if (vec[j] > 0) {
+						if (vec[i] >= vec[j]) { // reverse dir
+							scores[1] += logb(vec[i], 2) - logb(vec[j], 2);
+						}
+						if (vec[j] >= vec[i]) { // forward dir
+							scores[1] += logb(vec[j], 2) - logb(vec[i], 2);
+						}
+						break;
+					}
+				}
+			}
+		}  	
+		return scores;
+	}
+    
+	// generate new tile for the game
     public int generateNewCell() {
     	// 90% to generate a two
     	double randNum = Math.random();
@@ -590,6 +622,11 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	}
     	
     	return total;
+    }
+    
+    // return a log at a given base
+    public double logb(double a, double b) {
+    	return Math.log(a) / Math.log(b);
     }
     
     // generate a random int in a range

@@ -1,5 +1,6 @@
 package com.kevinsprong.gamesolver;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /*
@@ -13,16 +14,18 @@ public class GameState {
     private double gameEval;  // positive/negative infinity for player 1/2 win
     private double gameScore;  // score if game supports it
     private double moveNum = 0;
+    private ArrayList<Integer> moveQueue;
     
     //constructor
     public GameState() {
-    	this.boardState = null;
-    	this.playerToMove = 1;
-    	this.p1PreviousMove = "";
-    	this.p2PreviousMove = "";
-    	this.gameEval = 0;
-    	this.gameScore = 0;
-    	this.moveNum = 0;
+    	this.setBoardState(null);
+    	this.setPlayerToMove(1);
+    	this.setP1PreviousMove("");
+    	this.setP2PreviousMove("");
+    	this.setGameEval(0);
+    	this.setGameScore(0);
+    	this.setMoveNum(0);
+    	this.setMoveQueue(new ArrayList<Integer>()); 
     }
     
     // create a copy of a game state to avoid in-function modifications
@@ -43,6 +46,7 @@ public class GameState {
     	gsOut.setGameEval(gameStateIn.getGameEval()); 
     	gsOut.setGameScore(gameStateIn.getGameScore()); 
     	gsOut.setMoveNum(gameStateIn.getMoveNum()); 
+    	gsOut.setMoveQueue(gameStateIn.getMoveQueue()); 
      		
     	return gsOut;
     }
@@ -96,4 +100,11 @@ public class GameState {
  	public void setMoveNum(double moveNumIn) {
  		this.moveNum= moveNumIn;
  	}
+    // get/set for moveQueue
+  	public ArrayList<Integer> getMoveQueue() {
+  		return this.moveQueue;
+  	}
+  	public void setMoveQueue(ArrayList<Integer> moveQueueIn) {
+  		this.moveQueue = moveQueueIn;
+  	}
 }

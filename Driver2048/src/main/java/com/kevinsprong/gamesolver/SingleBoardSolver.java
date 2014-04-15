@@ -16,9 +16,9 @@ public class SingleBoardSolver
     	game.setWinCondition(8192);
     	
     	int[][] inputBoard = {
-    			{0,4,2,0},
-    			{0,0,0,0},
-    			{0,0,0,0},
+    			{1028,512,256,128},
+    			{8,16,32,64},
+    			{8,0,0,0},
     			{0,0,0,0}
     			};
     	
