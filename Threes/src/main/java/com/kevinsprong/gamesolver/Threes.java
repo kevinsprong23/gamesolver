@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Extension of TwoPlayerGame to play the game 2048
+ * Extension of TwoPlayerGame to play the game Threes!
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
@@ -360,18 +360,28 @@ public class Threes extends TwoPlayerGame {
 
     // given a move history, calculate the score
     public void updateGameScore(GameState currentState, int tileMade) {
-    	// update all of this with threes logic
+    	// making a tile >= 3 gives 3 ^ the multiple of 3 it is
+    	// ignore second argument, score here is solely derived from board
     	
-    	// n points for making tile n
+    	int totalScore = 0;
+    	int[][] currentBoard = currentState.getBoardState();
+    	
+    	for (int[] row : currentBoard) {
+    		for (int val : row) {
+    			if (val >= 3) {
+    				totalScore += Math.pow(3, (this.logb(val/3, 2) + 1));
+    			}
+    		}
+    	}
+    	
     	
     	// modify currentState that we are pointing to
-    	currentState.setGameScore(currentState.getGameScore() + tileMade);
+    	currentState.setGameScore(totalScore);
     }
     
 
 	// given a gameState and whose turn it is, find list of legal moves
     public String[] findLegalMoves(GameState gameStateIn) {
-    	// update all of this with threes logic
     	
     	GameState currentState = GameState.copyGameState(gameStateIn);
     	
@@ -404,9 +414,10 @@ public class Threes extends TwoPlayerGame {
     			legalMoveList.add("R");
     		}
     		
-    	} else { // computer player; legal moves are 4 and 2 to any open space
+    	} else { // computer player
+    		// update with threes logic
     		
-    		// get indices of open spaces
+    		// get indices of open spaces along row/col opposite move
     		List<int[]> zeroList = new ArrayList<int[]>();
 	    	for (int i = 0; i < 4; i++) {
 	    		for (int j = 0; j < 4; j++) {
