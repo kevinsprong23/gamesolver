@@ -78,7 +78,7 @@ public class PlyAnalysis {
 				game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
 				game.setSearchPly(7);
 				game.setWinCondition(65536);
-				game.setHeuristicWeights(new double[]{wR, mR, sR, oR});
+				game.setHeuristicWeights(new double[]{500, 1, 10, 10});
 				game.initializeBoard();
 
 				// play the game until there is a winner
