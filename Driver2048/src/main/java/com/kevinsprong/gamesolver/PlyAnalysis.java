@@ -30,16 +30,19 @@ public class PlyAnalysis {
 		int winStatus;
 		int highTile;
 		double score;
+		double moveNum;
 
 		// variables to hold sim results
 		int highestTile = 0;
 		int[] winRecord = new int[numTrials];
 		int[] highTiles = new int[numTrials];
 		int[] scores  = new int[numTrials];
+		int[] moveNums = new int[numTrials];
 		double avgWinPct;
 		double avgHighTile;
 		double avgScore;
-
+        double avgMoveNum;
+        
 		// file to write to
 		BufferedWriter writer = null;
 		String resultsFilePath = "PlyAnalysis2048.csv";
@@ -47,7 +50,7 @@ public class PlyAnalysis {
 		String newline = System.getProperty("line.separator");
 		System.out.println(resultsFile.getCanonicalPath());
 		writer = new BufferedWriter(new FileWriter(resultsFile));
-		writer.write("ply,avgWinPct,avgHighTile,highTile,avgScore" +
+		writer.write("ply,avgWinPct,avgHighTile,highTile,avgScore,avgMoveNum" +
 				newline);
 
 		// loop to optimize parameters
@@ -57,12 +60,12 @@ public class PlyAnalysis {
 
 			thisSetting++;
 
-
-
+			// reset results vectors
 			highestTile = 0;
 			winRecord = new int[numTrials];
 			highTiles = new int[numTrials];
 			scores  = new int[numTrials];
+			moveNums = new int[numTrials];
 
 			for (int k = 0; k < numTrials; k++) {
 
@@ -90,6 +93,7 @@ public class PlyAnalysis {
 				// get game results
 				score = game.getGameState().getGameScore();
 				highTile = getHighTile(game.getGameState().getBoardState());
+				moveNum = game.getGameState().getMoveNum();
 
 				// update results vectors
 				if (highTile > highestTile) {
@@ -97,6 +101,7 @@ public class PlyAnalysis {
 				}
 				scores[k] = (int) score;
 				highTiles[k] = highTile;
+				moveNums[k] = (int) moveNum;
 				if (highTile >= 2048) {
 					winRecord[k] = 1;
 				} else {
@@ -108,13 +113,15 @@ public class PlyAnalysis {
 			avgWinPct = calculateAverage(winRecord);
 			avgHighTile = calculateAverage(highTiles);
 			avgScore = calculateAverage(scores);
+			avgMoveNum = calculateAverage(moveNums);
 
 			writer.write(
 					Double.toString(pR) + "," +
 						Double.toString(avgWinPct) + "," +
 						Double.toString(avgHighTile) + "," +
 						Integer.toString(highestTile) + "," +
-						Double.toString(avgScore) + newline
+						Double.toString(avgScore) + "," +
+						Double.toString(avgMoveNum) + newline
 					);
 		}
 		double elapsedTime = (double) (System.nanoTime() - startTime) / 1e9;
