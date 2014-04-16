@@ -7,6 +7,7 @@ import java.util.Arrays;
  * Class to hold game state
  */
 public class GameState {
+	// TODO add drawStack and nextMove variables for Threes!
 	private int[][] boardState;  // values are a mapping to game pieces
     private int playerToMove = 1;  // player 1 moves first by definition
     private String p1PreviousMove; 
