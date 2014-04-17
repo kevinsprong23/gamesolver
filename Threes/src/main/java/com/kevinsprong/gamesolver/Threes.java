@@ -1,8 +1,11 @@
 package com.kevinsprong.gamesolver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * Extension of TwoPlayerGame to play the game Threes!
@@ -18,6 +21,7 @@ public class Threes extends TwoPlayerGame {
 	public void setHeuristicWeights(double[] heuristicWeightsIn) {
 		this.heuristicWeights = heuristicWeightsIn;
 	}
+	
     
 	// constructors
     public Threes() {
@@ -79,21 +83,26 @@ public class Threes extends TwoPlayerGame {
         // initialize game state
     	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
+    	
         newGameState.setBoardState(blankBoard);
     	this.setGameState(newGameState);
     }
     
     // implementation of abstract methods
     public void initializeBoard() {
-    	// replace all this with data from 
-    	// http://forums.toucharcade.com/showthread.php?t=218248&page=53
     	
     	GameState currentState = this.getGameState();
+    	
+    	// three ones, three twos, three threes in random locs
+    	// set move stack to one of each
+    	
+    	// assign
+    	
     	
     	// choose which numbers we will get
     	int pt1 = this.generateNewCell();
     	int pt2 = this.generateNewCell();
-    	// choose two random locations for tiles
+    	// choose nine random locations for tiles
         int randomNum1 = this.randIntInRange(0, 15);
         int randomNum2 = this.randIntInRange(0, 15);
         while (randomNum2 == randomNum1) {
@@ -137,19 +146,11 @@ public class Threes extends TwoPlayerGame {
     		if (p2Strat.equals("DefaultComputer")) { // choose a tile at random
     			// update all of this with threes logic
     			
-    			// choose which numbers we will get
+    			// choose which number(s) we will get
     	    	int pt1 = this.generateNewCell();
     	    	
     	    	// find zero tiles on current board and their indices
-    	    	int[][] currentBoard = currentState.getBoardState();
-    	    	List<int[]> zeroList = new ArrayList<int[]>();
-    	    	for (int i = 0; i < 4; i++) {
-    	    		for (int j = 0; j < 4; j++) {
-    	    			if (currentBoard[i][j] == 0) {
-    	    				zeroList.add(new int[]{i, j});
-    	    			}
-    	    		}
-    	    	}
+    	    	ArrayList<int[]> zeroList = this.getValidComputerMoveTiles(currentState);
     	    	
     	    	// choose random location for tile from among zero indices
     	        int randomNum1 = this.randIntInRange(0, zeroList.size()-1);
@@ -165,8 +166,6 @@ public class Threes extends TwoPlayerGame {
     
     // separate method to update game board of GameState manually
     public GameState calcUpdatedGameState(GameState gameStateIn, String move) {
-    	// update all of this with threes logic
-    	
     	
     	// give ourselves clean object to work with
     	GameState currentState = GameState.copyGameState(gameStateIn);
@@ -176,146 +175,119 @@ public class Threes extends TwoPlayerGame {
 
     	if (playerMoved == 1) {
     		
-    		// create new board to handle collapsing
-    		int [][] newBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
-    		int numZerosInPath = 0; // will need this when collapsing moves
-    		
     		// update depending on move
     		if (move.equals("U")) {
-    			// detect and collapse
-    			for (int j = 0; j < 4; j++) { // process each col independently
-    	    		for (int i = 0; i < 3; i++) {  // current tile to check
-    	    			for (int k = i+1; k < 4; k++) { // probe downwards 
-    	    				// break if you know condition can't be met
-    	    				if ((currentBoard[k][j] != currentBoard [i][j]) &&
-    	    						(currentBoard[k][j] != 0)) {
-    	    					break;
-    	    				} 
-    	    				// if there is a collision, assign it and break
-    	    				if (currentBoard[i][j] == currentBoard[k][j]) {
-    	    					// assign 
-    	    					currentBoard[i][j] = currentBoard[i][j]*2;
-    	    					currentBoard[k][j] = 0;
-    	    					// update score
-    	    					updateGameScore(currentState, currentBoard[i][j]);
-    	    					break;
-    	    				} 
-    	    			}
-    	    		}
-    	    	}
-    			// move everything up into blank spots
-    			for (int j = 0; j < 4; j++) { // each element will move up by the number of zeros above it
-    				numZerosInPath = 0;
-    	    		for (int i = 0; i < 4; i++) {
-    	    			if (currentBoard[i][j] == 0) {
-    	    				numZerosInPath++;
-    	    			} else {
-    	    				newBoard[i-numZerosInPath][j] = currentBoard[i][j];
-    	    			}
-    	    		}
-    	    	}
-    		} else if (move.equals("D")) {
-    			// detect and collapse
+    			// move everything up one tile, collide at top.  one collision per move
     			for (int j = 0; j < 4; j++) {
-    	    		for (int i = 3; i > 0; i--) {
-    	    			for (int k = i-1; k >=0; k--) { // probe upwards 
-    	    				// break if you know condition can't be met
-    	    				if ((currentBoard[k][j] != currentBoard [i][j]) &&
-    	    						(currentBoard[k][j] != 0)) {
-    	    					break;
-    	    				} 
-    	    				// if there is a collision, assign it and break
-    	    				if (currentBoard[i][j] == currentBoard[k][j]) {
-    	    					// assign 
-    	    					currentBoard[i][j] = currentBoard[i][j]*2;
-    	    					currentBoard[k][j] = 0;
-    	    					// update score
-    	    					updateGameScore(currentState, currentBoard[i][j]);
-    	    					break;
-    	    				} 
-    	    			}
-    	    		}
-    	    	}
-    			// move everything down into blank spots
-    			for (int j = 0; j < 4; j++) { // each element will move down by the number of zeros below it
-    				numZerosInPath = 0;
-    	    		for (int i = 3; i >= 0 ; i--) {
-    	    			if (currentBoard[i][j] == 0) {
-    	    				numZerosInPath++;
-    	    			} else {
-    	    				newBoard[i+numZerosInPath][j] = currentBoard[i][j];
-    	    			}
-    	    		}
-    	    	}
+    				// find and perform collision
+    				for (int i = 1; i < 4; i++) {
+    					if (currentBoard[i][j] > 0) {
+    						if (currentBoard[i][j] == currentBoard[i-1][j]) {
+    							currentBoard[i-1][j] = 2*currentBoard[i-1][j];
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    						// because board(i,j) > 0 this detects a 1 and 2
+    						if (currentBoard[i][j] + currentBoard[i-1][j] == 3) {
+    							currentBoard[i-1][j] = 3;
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    					}
+    				}
+    				// move everything up if there is a zero above
+    				for (int i = 1; i < 4; i++) {
+    					if (currentBoard[i-1][j] == 0) {
+    						currentBoard[i-1][j] = currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    					}
+    				}
+    			}
+    		} else if (move.equals("D")) {
+    			// move everything down one tile, collide at bottom.  one collision per move
+    			for (int j = 0; j < 4; j++) {
+    				// find and perform collision
+    				for (int i = 2; i >= 0; i--) {
+    					if (currentBoard[i][j] > 0) {
+    						if (currentBoard[i][j] == currentBoard[i+1][j]) {
+    							currentBoard[i+1][j] = 2*currentBoard[i+1][j];
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    						// because board(i,j) > 0 this detects a 1 and 2
+    						if (currentBoard[i][j] + currentBoard[i+1][j] == 3) {
+    							currentBoard[i+1][j] = 3;
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    					}
+    				}
+    				// move everything down if there is a zero below
+    				for (int i = 2; i >= 0; i--) {
+    					if (currentBoard[i+1][j] == 0) {
+    						currentBoard[i+1][j] = currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    					}
+    				}
+    			}
     		} else if (move.equals("L")) {
-    			// detect and collapse
+    			// move everything left one tile, collide at left.  one collision per move
     			for (int i = 0; i < 4; i++) {
-    	    		for (int j = 0; j < 3; j++) {
-    	    			for (int k = j+1; k < 4; k++) { // probe rightwards 
-    	    				// break if you know condition can't be met
-    	    				if ((currentBoard[i][k] != currentBoard [i][j]) &&
-    	    						(currentBoard[i][k] != 0)) {
-    	    					break;
-    	    				} 
-    	    				// if there is a collision, assign it and break
-    	    				if (currentBoard[i][j] == currentBoard[i][k]) {
-    	    					// assign 
-    	    					currentBoard[i][j] = currentBoard[i][j]*2;
-    	    					currentBoard[i][k] = 0;
-    	    					// update score
-    	    					updateGameScore(currentState, currentBoard[i][j]);
-    	    					break;
-    	    				} 
-    	    			}
-    	    		}
-    	    	}
-    			// move everything up into blank spots
-    			for (int i = 0; i < 4; i++) { 
-    				numZerosInPath = 0;
-    	    		for (int j = 0; j < 4; j++) {
-    	    			if (currentBoard[i][j] == 0) {
-    	    				numZerosInPath++;
-    	    			} else {
-    	    				newBoard[i][j-numZerosInPath] = currentBoard[i][j];
-    	    			}
-    	    		}
-    	    	}
+    				// find and perform collision
+    				for (int j = 1; j < 4; j++) {
+    					if (currentBoard[i][j] > 0) {
+    						if (currentBoard[i][j] == currentBoard[i][j-1]) {
+    							currentBoard[i][j-1] = 2*currentBoard[i][j-1];
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    						// because board(i,j) > 0 this detects a 1 and 2
+    						if (currentBoard[i][j] + currentBoard[i][j-1] == 3) {
+    							currentBoard[i][j-1] = 3;
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    					}
+    				}
+    				// move everything left if there is a zero adjacent
+    				for (int j = 1; j < 4; j++) {
+    					if (currentBoard[i][j-1] == 0) {
+    						currentBoard[i][j-1] = currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    					}
+    				}
+    			}
     		} else if (move.equals("R")) {
-    			// detect and collapse
+    			// move everything right one tile, collide at right.  one collision per move
     			for (int i = 0; i < 4; i++) {
-    	    		for (int j = 3; j > 0; j--) {
-    	    			for (int k = j-1; k >=0; k--) { // probe leftwards
-    	    				// break if you know condition can't be met
-    	    				if ((currentBoard[i][k] != currentBoard [i][j]) &&
-    	    						(currentBoard[i][k] != 0)) {
-    	    					break;
-    	    				} 
-    	    				// if there is a collision, assign it and break
-    	    				if (currentBoard[i][j] == currentBoard[i][k]) {
-    	    					// assign 
-    	    					currentBoard[i][j] = currentBoard[i][j]*2;
-    	    					currentBoard[i][k] = 0;
-    	    					// update score
-    	    					updateGameScore(currentState, currentBoard[i][j]);
-    	    					break;
-    	    				} 
-    	    			}
-    	    		}
-    	    	}
-    			// move everything up into blank spots
-    			for (int i = 0; i < 4; i++) { 
-    				numZerosInPath = 0;
-    	    		for (int j = 3; j >= 0; j--) {
-    	    			if (currentBoard[i][j] == 0) {
-    	    				numZerosInPath++;
-    	    			} else {
-    	    				newBoard[i][j+numZerosInPath] = currentBoard[i][j];
-    	    			}
-    	    		}
-    	    	}
-    		} 
+    				// find and perform collision
+    				for (int j = 2; j >= 0; j--) {
+    					if (currentBoard[i][j] > 0) {
+    						if (currentBoard[i][j] == currentBoard[i][j+1]) {
+    							currentBoard[i][j+1] = 2*currentBoard[i][j+1];
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    						// because board(i,j) > 0 this detects a 1 and 2
+    						if (currentBoard[i][j] + currentBoard[i][j+1] == 3) {
+    							currentBoard[i][j+1] = 3;
+    							currentBoard[i][j] = 0;
+    							break;
+    						}
+    					}
+    				}
+    				// move everything right if there is a zero adjacent
+    				for (int j = 2; j >= 0; j--) {
+    					if (currentBoard[i][j+1] == 0) {
+    						currentBoard[i][j+1] = currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    					}
+    				}
+    			}
+    		}
+    			
     		// assign new board back to game state
-    		currentState.setBoardState(newBoard);	
+    		currentState.setBoardState(currentBoard);	// unnec. due to obj pointer pass?
     		
     	} else {
     		
@@ -328,6 +300,19 @@ public class Threes extends TwoPlayerGame {
     		currentBoard[pt1y][pt1x] = pt1;
     		// assign it to the board
     		currentState.setBoardState(currentBoard);	
+    		
+    		// update move stack to zero out the move element
+        	int[] moveList = currentState.getMoveStack();
+        	for (int j = 0; j < 12; j++) {
+        		if (moveList[j] > 0) {
+        			moveList[j] = 0;
+        			break;
+        		}
+        		if (moveList[j] == 11) { // array is all zeros; reset move stack
+        			currentState.setMoveStack(this.generateNewMoveStack());
+        			break;
+        		}
+        	}
     		
     	}
     	
@@ -345,8 +330,9 @@ public class Threes extends TwoPlayerGame {
     	} else {
     		currentMove = currentState.getP2PreviousMove();
     	}
-    	// this call calculates the updated board
-    	GameState newGameState = calcUpdatedGameState(currentState, currentMove);
+    	// this call calculates the updated board and moveStack
+    	GameState newGameState = calcUpdatedGameState(currentState, currentMove);  	
+    	
     	// switch playerToMove - flip 1 to 2 and vice versa
     	newGameState.setPlayerToMove((playerMoved % 2) + 1);
     	// add a move to the overall list
@@ -415,21 +401,23 @@ public class Threes extends TwoPlayerGame {
     		}
     		
     	} else { // computer player
-    		// update with threes logic
+    		// get the valid move tiles
+    		ArrayList<int[]> zeroList = this.getValidComputerMoveTiles(currentState);
     		
-    		// get indices of open spaces along row/col opposite move
-    		List<int[]> zeroList = new ArrayList<int[]>();
-	    	for (int i = 0; i < 4; i++) {
-	    		for (int j = 0; j < 4; j++) {
-	    			if (boardOrig[i][j] == 0) {
-	    				zeroList.add(new int[]{i, j});
-	    			}
-	    		}
+	    	// legal moves are the top of the moveStack or the bonusMoveList, to open tiles
+	    	// opposite P1's move
+	    	// parse moveStack
+	    	List<Integer> uniqueMoves = new ArrayList<Integer>();
+	    	int topMove = this.getGameState().getMoveStack()[1];
+	    	uniqueMoves.add(topMove);
+	    	for (int bonus : this.findBonusMoves()) {
+	    		uniqueMoves.add(bonus);
 	    	}
-	    	// legal moves are 2 and 4
-	    	int[] legalMoveTiles = {2, 4};
+	    	
+	    	Integer[] legalMoveTiles = uniqueMoves.toArray(
+	    			new Integer[uniqueMoves.size()]);
 	    	// build list of moves
-	    	for (int tile : legalMoveTiles) {
+	    	for (int tile : legalMoveTiles) { // yay auto-unboxing
 	    		for (int[] pos : zeroList) {
 	    			legalMoveList.add(Integer.toString(tile) + "_" + 
 	    					Integer.toString(pos[0]) + "_" + 
@@ -442,7 +430,42 @@ public class Threes extends TwoPlayerGame {
     	return legalMoveList.toArray(new String[legalMoveList.size()]);
     }
     
-    // determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
+    private ArrayList<int[]> getValidComputerMoveTiles(GameState gsIn) {
+    	ArrayList<int[]> zeroList = new ArrayList<int[]>();
+    	
+    	// get indices of open spaces along row/col opposite move
+    	int[][] boardOrig = gsIn.getBoardState();
+    	
+    	String p1Move = gsIn.getP1PreviousMove();
+    	if (p1Move.equals("U")) {
+    		for (int i = 0; i < 4; i++) {
+    			if (boardOrig[3][i] > 0) {
+    				zeroList.add(new int[]{3,i});
+    			}
+    		}
+    	} else if (p1Move.equals("D")) {
+    		for (int i = 0; i < 4; i++) {
+    			if (boardOrig[0][i] > 0) {
+    				zeroList.add(new int[]{0,i});
+    			}
+    		}
+    	} else if (p1Move.equals("L")) {
+    		for (int i = 0; i < 4; i++) {
+    			if (boardOrig[i][3] > 0) {
+    				zeroList.add(new int[]{i,3});
+    			}
+    		}
+    	} else if (p1Move.equals("R")) {
+    		for (int i = 0; i < 4; i++) {
+    			if (boardOrig[i][0] > 0) {
+    				zeroList.add(new int[]{i,0});
+    			}
+    		}
+    	}
+    	return zeroList;
+    	
+	}
+	// determine if win condition met - returns 0, 1, 2 for no winner yet/p1/p2
     public int determineWinner() {
     	GameState currentState = GameState.copyGameState(this.getGameState());
 
@@ -460,15 +483,7 @@ public class Threes extends TwoPlayerGame {
     	}
 
     	// find max tile on board
-    	int[][] currentBoard = currentState.getBoardState();
-    	int maxTile = 0;
-    	for (int i = 0; i < 4; i++) {
-    		for (int j = 0; j < 4; j++) {
-    			if (currentBoard[i][j] > maxTile) {
-    				maxTile = currentBoard[i][j];
-    			}
-    		}
-    	}
+    	int maxTile = getMaxTile(currentState);
 
     	if (maxTile >= this.getWinCondition()) {
     		return 1;
@@ -605,18 +620,92 @@ public class Threes extends TwoPlayerGame {
 		return scores;
 	}
     
+    
+    
 	// generate new tile for the game
     public int generateNewCell() {
-    	// replace all this with data from 
-    	// http://forums.toucharcade.com/showthread.php?t=218248&page=53
-    	
-    	// 90% to generate a two
-    	double randNum = Math.random();
-    	if (randNum <= 0.9) {
-    		return 2;
-    	} else {
-    		return 4;
+    	int rand = this.randIntInRange(1,21);
+    	int output = 0;
+    	// 1/21 to return a bonus tile
+    	if (rand == 1) {
+    		int[] bonusMoves = this.findBonusMoves();
+    		int bidx = randIntInRange(0, bonusMoves.length-1);
+    		output = bonusMoves[bidx];
+    	} else { // 20/21 to return first non-zero tile in moveStack
+    		// find first non-zero tile of moveStack
+    		int [] moveStack = this.getGameState().getMoveStack();
+    		for (int i = 0; i < moveStack.length; i++) {
+    			if (moveStack[i] > 0) {
+    				output = moveStack[i];
+    				break;
+    			}
+    		}
     	}
+    	return output;
+    }
+    
+    public int[] findBonusMoves() {
+    	int bonusTiles[] = {};
+    	
+    	// find max tile
+    	int maxTile = this.getMaxTile(this.getGameState());
+    	if (maxTile >= 48) {
+    		// return all multiples of 6 that are between 6 and maxTile/8
+    		int maxTileMult = maxTile / 8 / 6;
+    		bonusTiles = new int[maxTileMult];
+    		for (int i = 1; i < maxTileMult; i++) {
+    			bonusTiles[i-1] = 3 * (int) Math.pow(2, i);
+    		}
+    		
+    	}
+    	
+    	return bonusTiles;
+    }
+    
+    public int[] generateNewMoveStack() {
+    	// generate 12 vector of four 1's, four 2's, four 3's.
+    	int[] newMoveStack = new int[12];
+    	double[] doubleStack = new double[12];
+    	double[] doubleStackCopy = new double[12];
+    	int[] doubleStackIndex = new int[12];
+    	double thisDouble;
+    	
+    	// create array of Random numbers and a sorted copy
+    	for (int i = 0; i < 12; i++) {
+    		thisDouble = Math.random();
+    		doubleStack[i] = thisDouble;
+    		doubleStackCopy[i] = thisDouble;	
+    	}
+    	Arrays.sort(doubleStackCopy);
+    	// find each number in sorted array
+    	for (int i = 0; i < 12; i++) {
+    		for (int j = 0; j < 12; j++) {
+    			if (doubleStack[i] == doubleStackCopy[j]) {
+    				doubleStackIndex[i] = j;
+    				break;
+    			}
+    		}
+    	}
+    	
+    	for (int i = 0; i < 12; i++) {
+    		newMoveStack[i] = doubleStackIndex[i] / 3 + 1; // integer division exploit to round the num down
+    	}
+    	
+    	return newMoveStack;
+    }
+    
+    // get max tile of a game state
+    public int getMaxTile(GameState gameStateIn) {
+    	int [][] currentBoard = gameStateIn.getBoardState();
+    	int maxTile = 0;
+    	for (int i = 0; i < 4; i++) {
+    		for (int j = 0; j < 4; j++) {
+    			if (currentBoard[i][j] > maxTile) {
+    				maxTile = currentBoard[i][j];
+    			}
+    		}
+    	}
+    	return maxTile;
     }
     
     // check whether two boards are identical

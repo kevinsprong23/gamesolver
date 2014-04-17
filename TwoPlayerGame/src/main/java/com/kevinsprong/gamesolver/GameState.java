@@ -7,7 +7,6 @@ import java.util.Arrays;
  * Class to hold game state
  */
 public class GameState {
-	// TODO add drawStack and nextMove variables for Threes!
 	private int[][] boardState;  // values are a mapping to game pieces
     private int playerToMove = 1;  // player 1 moves first by definition
     private String p1PreviousMove; 
@@ -15,8 +14,8 @@ public class GameState {
     private double gameEval;  // positive/negative infinity for player 1/2 win
     private double gameScore;  // score if game supports it
     private double moveNum = 0;
-    private ArrayList<Integer> moveQueue;
-    
+    private int[] moveStack; // array instead of list for controlled ordered access
+
     //constructor
     public GameState() {
     	this.setBoardState(null);
@@ -26,7 +25,7 @@ public class GameState {
     	this.setGameEval(0);
     	this.setGameScore(0);
     	this.setMoveNum(0);
-    	this.setMoveQueue(new ArrayList<Integer>()); 
+    	this.setMoveStack(null); 
     }
     
     // create a copy of a game state to avoid in-function modifications
@@ -47,7 +46,7 @@ public class GameState {
     	gsOut.setGameEval(gameStateIn.getGameEval()); 
     	gsOut.setGameScore(gameStateIn.getGameScore()); 
     	gsOut.setMoveNum(gameStateIn.getMoveNum()); 
-    	gsOut.setMoveQueue(gameStateIn.getMoveQueue()); 
+    	gsOut.setMoveStack(gameStateIn.getMoveStack()); 
      		
     	return gsOut;
     }
@@ -101,11 +100,11 @@ public class GameState {
  	public void setMoveNum(double moveNumIn) {
  		this.moveNum= moveNumIn;
  	}
-    // get/set for moveQueue
-  	public ArrayList<Integer> getMoveQueue() {
-  		return this.moveQueue;
+    // get/set for moveStack
+  	public int[] getMoveStack() {
+  		return this.moveStack;
   	}
-  	public void setMoveQueue(ArrayList<Integer> moveQueueIn) {
-  		this.moveQueue = moveQueueIn;
+  	public void setMoveStack(int[] moveStackIn) {
+  		this.moveStack = moveStackIn;
   	}
 }
