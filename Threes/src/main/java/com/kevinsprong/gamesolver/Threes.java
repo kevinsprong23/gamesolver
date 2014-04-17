@@ -94,32 +94,36 @@ public class Threes extends TwoPlayerGame {
     	GameState currentState = this.getGameState();
     	
     	// three ones, three twos, three threes in random locs
-    	// set move stack to one of each
+    	int[] rows = new int[9];
+    	int[] cols = new int[9];
+    	int[] vals = {1,1,1,2,2,2,3,3,3};
     	
-    	// assign
+    	// generate random nums from 0 to 15 in loop, check against hash set, and make x/y
+    	Set<Integer> randsChosen = new HashSet<Integer>();
+    	int numsChosen = 0;
+    	while (numsChosen < 9) { // could do fewer checks for blank spaces and have fewer, but then indexing gets hard
+    		int randInt = this.randIntInRange(0, 15);
+    		while (randsChosen.contains(randInt)) {
+    			randInt = this.randIntInRange(0, 15);
+    		}
+    		rows[numsChosen] = randInt % 4;
+    		cols[numsChosen] = randInt / 4;
+    	}
+         
     	
-    	
-    	// choose which numbers we will get
-    	int pt1 = this.generateNewCell();
-    	int pt2 = this.generateNewCell();
-    	// choose nine random locations for tiles
-        int randomNum1 = this.randIntInRange(0, 15);
-        int randomNum2 = this.randIntInRange(0, 15);
-        while (randomNum2 == randomNum1) {
-        	randomNum2 = this.randIntInRange(0, 15);
-        }
-        int pt1x = (randomNum1 % 4);
-        int pt1y = randomNum1 / 4;
-        int pt2x = (randomNum2 % 4);
-        int pt2y = randomNum2 / 4;
-        
-        // assign to game state
+    	// assign to game state
         int[][] currentBoard = currentState.getBoardState();
-        currentBoard[pt1y][pt1x] = pt1;
-        currentBoard[pt2y][pt2x] = pt2;
+        for(int i = 0; i < 9; i++) {
+        	currentBoard[rows[i]][cols[i]] = vals[i];
+        }
         currentState.setBoardState(currentBoard);
         
+        // set remaining move stack to one of each
+    	currentState.setMoveStack(this.generateFirstMoveStack());
+    	
+    	// assign to game state
         this.setGameState(currentState);
+        
     }
     
     // given a game state and strategies, return next player move
@@ -689,6 +693,41 @@ public class Threes extends TwoPlayerGame {
     	
     	for (int i = 0; i < 12; i++) {
     		newMoveStack[i] = doubleStackIndex[i] / 3 + 1; // integer division exploit to round the num down
+    	}
+    	
+    	return newMoveStack;
+    }
+    
+    public int[] generateFirstMoveStack() {
+    	// generate 12 vector of nine zeros, a one, a two, and a three
+    	int[] newMoveStack = new int[12];
+    	double[] doubleStack = new double[3];
+    	double[] doubleStackCopy = new double[3];
+    	int[] doubleStackIndex = new int[3];
+    	double thisDouble;
+    	
+    	// create array of Random numbers and a sorted copy
+    	for (int i = 0; i < 3; i++) {
+    		thisDouble = Math.random();
+    		doubleStack[i] = thisDouble;
+    		doubleStackCopy[i] = thisDouble;	
+    	}
+    	Arrays.sort(doubleStackCopy);
+    	// find each number in sorted array
+    	for (int i = 0; i < 3; i++) {
+    		for (int j = 0; j < 3; j++) {
+    			if (doubleStack[i] == doubleStackCopy[j]) {
+    				doubleStackIndex[i] = j;
+    				break;
+    			}
+    		}
+    	}
+    	
+    	for (int i = 0; i < 9; i++) {
+    		newMoveStack[i] = 0;
+    	}
+    	for (int i = 0; i < 3; i++) {
+    		newMoveStack[i+9] = doubleStackIndex[i] / 3 + 1; // integer division exploit to round the num down
     	}
     	
     	return newMoveStack;
