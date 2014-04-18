@@ -11,14 +11,17 @@ import java.util.ArrayList;
  */
 public class ParamOptimizer2048 {
     public static void main( String[] args ) throws IOException {
+    	// out file location
+    	String resultsFilePath = "ParameterSearch2048Refine.csv";
+    	
     	// num sims per parameter setting
-    	int numTrials = 10;
+    	int numTrials = 20;
     	
     	// sim parameters
-    	double [] winRange = {0, 500, 500};
-    	double [] monoRange =  {0, 10, 2};
-    	double [] smoothRange =  {0, 10, 2};
-    	double [] openRange =  {0, 10, 2};
+    	double [] winRange = {500, 500, 1};
+    	double [] monoRange =  {2, 2, 1};
+    	double [] smoothRange =  {4, 6, 0.2};
+    	double [] openRange =  {0, 0, 1};
     	ArrayList<Double> winVec = new ArrayList<Double>();
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();
@@ -55,7 +58,6 @@ public class ParamOptimizer2048 {
     	
     	// file to write to
     	BufferedWriter writer = null;
-    	String resultsFilePath = "ParameterSearch2048.csv";
     	File resultsFile = new File(resultsFilePath);
     	String newline = System.getProperty("line.separator");
     	System.out.println(resultsFile.getCanonicalPath());

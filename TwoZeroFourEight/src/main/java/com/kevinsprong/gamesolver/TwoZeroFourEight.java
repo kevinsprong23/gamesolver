@@ -9,7 +9,7 @@ import java.util.Random;
  */
 public class TwoZeroFourEight extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {5000, 1, 10, 5};
+	private double[] heuristicWeights = {500, 2, 5, 0};
 	
 	// getter and setter
 	public double[] getHeuristicWeights() {
