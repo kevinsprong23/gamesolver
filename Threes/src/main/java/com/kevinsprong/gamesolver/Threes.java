@@ -93,10 +93,17 @@ public class Threes extends TwoPlayerGame {
     	
     	GameState currentState = this.getGameState();
     	
-    	// three ones, three twos, three threes in random locs
+    	// a random set of ones, twos, threes
     	int[] rows = new int[9];
     	int[] cols = new int[9];
-    	int[] vals = {1,1,1,2,2,2,3,3,3};
+    	int[] vals = new int[9];
+    	
+    	// draw 9 values at random
+    	int[] curMoveStack = currentState.getMoveStack();
+    	for (int i = 0; i < 9; i++) {
+    		vals[i] = curMoveStack[i];
+    		curMoveStack[i] = 0;
+    	}
     	
     	// generate random nums from 0 to 15 in loop, check against hash set, and make x/y
     	Set<Integer> randsChosen = new HashSet<Integer>();
@@ -119,7 +126,7 @@ public class Threes extends TwoPlayerGame {
         currentState.setBoardState(currentBoard);
         
         // set remaining move stack to one of each
-    	currentState.setMoveStack(this.generateFirstMoveStack());
+    	currentState.setMoveStack(curMoveStack);
     	
     	// assign to game state
         this.setGameState(currentState);
@@ -698,40 +705,6 @@ public class Threes extends TwoPlayerGame {
     	return newMoveStack;
     }
     
-    public int[] generateFirstMoveStack() {
-    	// generate 12 vector of nine zeros, a one, a two, and a three
-    	int[] newMoveStack = new int[12];
-    	double[] doubleStack = new double[3];
-    	double[] doubleStackCopy = new double[3];
-    	int[] doubleStackIndex = new int[3];
-    	double thisDouble;
-    	
-    	// create array of Random numbers and a sorted copy
-    	for (int i = 0; i < 3; i++) {
-    		thisDouble = Math.random();
-    		doubleStack[i] = thisDouble;
-    		doubleStackCopy[i] = thisDouble;	
-    	}
-    	Arrays.sort(doubleStackCopy);
-    	// find each number in sorted array
-    	for (int i = 0; i < 3; i++) {
-    		for (int j = 0; j < 3; j++) {
-    			if (doubleStack[i] == doubleStackCopy[j]) {
-    				doubleStackIndex[i] = j;
-    				break;
-    			}
-    		}
-    	}
-    	
-    	for (int i = 0; i < 9; i++) {
-    		newMoveStack[i] = 0;
-    	}
-    	for (int i = 0; i < 3; i++) {
-    		newMoveStack[i+9] = doubleStackIndex[i] / 3 + 1; // integer division exploit to round the num down
-    	}
-    	
-    	return newMoveStack;
-    }
     
     // get max tile of a game state
     public int getMaxTile(GameState gameStateIn) {
