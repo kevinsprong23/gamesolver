@@ -17,10 +17,10 @@ public class SingleBoardSolver
     	game.setHeuristicWeights(new double[]{500, 2.2, 4.6, 0});
     	
     	int[][] inputBoard = {
-    			{1028,512,256,128},
-    			{8,16,32,64},
-    			{8,0,0,0},
-    			{0,0,0,0}
+    			{4,16,32,0},
+    			{8,16,0,0},
+    			{4,0,0,0},
+    			{2,0,0,2}
     			};
     	
     	
