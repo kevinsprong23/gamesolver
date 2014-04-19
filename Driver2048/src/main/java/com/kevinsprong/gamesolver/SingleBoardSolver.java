@@ -14,6 +14,7 @@ public class SingleBoardSolver
     	
     	game.setSearchPly(7);
     	game.setWinCondition(8192);
+    	game.setHeuristicWeights(new double[]{500, 2.2, 4.6, 0});
     	
     	int[][] inputBoard = {
     			{1028,512,256,128},
