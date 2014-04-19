@@ -11,15 +11,18 @@ import java.util.ArrayList;
  */
 public class PlyAnalysis {
 	public static void main( String[] args ) throws IOException {
+		
+		// output file
+		String resultsFilePath = "PlyAnalysis2048.csv";
 		// num sims per parameter setting
-		int numTrials = 20;
+		int numTrials = 30;
 
 		// sim parameters
-		double [] plyRange = {1, 7, 1};
+		int [] plyRange = {0, 7, 1};
 
-		ArrayList<Double> plyVec = new ArrayList<Double>();
+		ArrayList<Integer> plyVec = new ArrayList<Integer>();
 
-		for (double pR = plyRange[0]; pR <= plyRange[1]; pR += plyRange[2]) {
+		for (int pR = plyRange[0]; pR <= plyRange[1]; pR += plyRange[2]) {
 			plyVec.add(pR);
 		}
 
@@ -47,7 +50,6 @@ public class PlyAnalysis {
         
 		// file to write to
 		BufferedWriter writer = null;
-		String resultsFilePath = "PlyAnalysis2048.csv";
 		File resultsFile = new File(resultsFilePath);
 		String newline = System.getProperty("line.separator");
 		System.out.println(resultsFile.getCanonicalPath());
@@ -58,7 +60,7 @@ public class PlyAnalysis {
 		// loop to optimize parameters
 		long startTime = System.nanoTime();
 		int thisSetting = 0;
-		for (double pR : plyVec) {
+		for (int pR : plyVec) {
 
 			thisSetting++;
 
@@ -78,8 +80,12 @@ public class PlyAnalysis {
 					", Trial " + Integer.toString(k+1));
 
 				// create a new game
-				game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
-				game.setSearchPly(7);
+				if (pR == 0) {
+					game = new TwoZeroFourEight("Random", "DefaultComputer");
+				} else {
+					game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
+				}
+				game.setSearchPly(pR);
 				game.setWinCondition(65536);
 				game.setHeuristicWeights(new double[]{500, 2.2, 4.6, 0});
 				game.initializeBoard();
