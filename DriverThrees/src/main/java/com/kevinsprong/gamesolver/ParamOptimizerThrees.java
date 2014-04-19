@@ -42,7 +42,7 @@ public class ParamOptimizerThrees {
     			smoothVec.size() * openVec.size();
     	
     	// variables to hold game info
-    	TwoPlayerGame game;
+    	Threes game;
     	int winStatus;
     	int highTile;
     	double score;
