@@ -5,10 +5,8 @@ import java.util.Arrays;
 /**
  * Class to play one (or many) game(s) of 2048 using the TwoZeroFourEight class
  */
-public class SingleBoardSolver
-{
-    public static void main( String[] args )
-    {
+public class SingleBoardSolver {
+    public static void main( String[] args ) {
         // make a new game
     	Threes game = new Threes("AlphaBeta", "DefaultComputer");
     	

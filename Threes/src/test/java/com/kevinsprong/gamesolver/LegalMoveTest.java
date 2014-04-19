@@ -11,7 +11,7 @@ public class LegalMoveTest {
 	// instantiate a game
 	@Before
 	public void setUp() {
-		game = new Threes();	
+		game = new Threes();
 	}
     //-------------------------------------------------------------------------
 	// check player 1 legal moves

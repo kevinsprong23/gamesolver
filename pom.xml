@@ -13,6 +13,7 @@
     <module>TwoZeroFourEight</module>
     <module>Driver2048</module>
     <module>Threes</module>
+    <module>DriverThrees</module>
   </modules>
   <build>
     <plugins>

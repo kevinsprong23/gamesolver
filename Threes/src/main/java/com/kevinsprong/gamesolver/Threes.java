@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 2, 5, 0};
+	private double[] heuristicWeights = {5000, 2.2, 5.2, 10};
 	
 	// getter and setter
 	public double[] getHeuristicWeights() {
@@ -36,6 +36,7 @@ public class Threes extends TwoPlayerGame {
     	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
         newGameState.setBoardState(blankBoard);
+        newGameState.setMoveStack(this.generateNewMoveStack());
     	this.setGameState(newGameState);
  	
     }
@@ -52,6 +53,7 @@ public class Threes extends TwoPlayerGame {
     	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
         newGameState.setBoardState(blankBoard);
+        newGameState.setMoveStack(this.generateNewMoveStack());
     	this.setGameState(newGameState);
     	
     }
@@ -68,6 +70,7 @@ public class Threes extends TwoPlayerGame {
     	GameState newGameState = new GameState();
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
         newGameState.setBoardState(blankBoard);
+        newGameState.setMoveStack(this.generateNewMoveStack());
     	this.setGameState(newGameState);
     }
     
@@ -85,6 +88,7 @@ public class Threes extends TwoPlayerGame {
     	int[][] blankBoard = {{0,0,0,0},{0,0,0,0},{0,0,0,0},{0,0,0,0}};
     	
         newGameState.setBoardState(blankBoard);
+        newGameState.setMoveStack(this.generateNewMoveStack());
     	this.setGameState(newGameState);
     }
     
@@ -194,17 +198,18 @@ public class Threes extends TwoPlayerGame {
     				for (int i = 1; i < 4; i++) {
     					if ((i == 1 || currentBoard[i-2][j] != 0) 
     							&& currentBoard[i][j] > 0) {
-    						if (currentBoard[i][j] == currentBoard[i-1][j]) {
-    							currentBoard[i-1][j] = 2*currentBoard[i-1][j];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
     						// because board(i,j) > 0 this detects a 1 and 2
     						if (currentBoard[i][j] + currentBoard[i-1][j] == 3) {
     							currentBoard[i-1][j] = 3;
     							currentBoard[i][j] = 0;
     							break;
+    						} else if (currentBoard[i][j] > 2 && 
+    								currentBoard[i][j] == currentBoard[i-1][j]) {
+    							currentBoard[i-1][j] = 2*currentBoard[i-1][j];
+    							currentBoard[i][j] = 0;
+    							break;
     						}
+    						
     					}
     				}
     				// move everything up if there is a zero above
@@ -222,17 +227,18 @@ public class Threes extends TwoPlayerGame {
     				for (int i = 2; i >= 0; i--) {
     					if ((i == 2 || currentBoard[i+2][j] != 0) 
     							&& currentBoard[i][j] > 0) {
-    						if (currentBoard[i][j] == currentBoard[i+1][j]) {
-    							currentBoard[i+1][j] = 2*currentBoard[i+1][j];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
     						// because board(i,j) > 0 this detects a 1 and 2
     						if (currentBoard[i][j] + currentBoard[i+1][j] == 3) {
     							currentBoard[i+1][j] = 3;
     							currentBoard[i][j] = 0;
     							break;
+    						} else if (currentBoard[i][j] > 2 && 
+    								currentBoard[i][j] == currentBoard[i+1][j]) {
+    							currentBoard[i+1][j] = 2*currentBoard[i+1][j];
+    							currentBoard[i][j] = 0;
+    							break;
     						}
+    						
     					}
     				}
     				// move everything down if there is a zero below
@@ -250,17 +256,18 @@ public class Threes extends TwoPlayerGame {
     				for (int j = 1; j < 4; j++) {
     					if ((j == 1 || currentBoard[i][j-2] != 0) 
     							&& currentBoard[i][j] > 0) {
-    						if (currentBoard[i][j] == currentBoard[i][j-1]) {
-    							currentBoard[i][j-1] = 2*currentBoard[i][j-1];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
     						// because board(i,j) > 0 this detects a 1 and 2
     						if (currentBoard[i][j] + currentBoard[i][j-1] == 3) {
     							currentBoard[i][j-1] = 3;
     							currentBoard[i][j] = 0;
     							break;
+    						} else if (currentBoard[i][j] > 2 && 
+    								currentBoard[i][j] == currentBoard[i][j-1]) {
+    							currentBoard[i][j-1] = 2*currentBoard[i][j-1];
+    							currentBoard[i][j] = 0;
+    							break;
     						}
+    						
     					}
     				}
     				// move everything left if there is a zero adjacent
@@ -278,17 +285,18 @@ public class Threes extends TwoPlayerGame {
     				for (int j = 2; j >= 0; j--) {
     					if ((j == 2 || currentBoard[i][j+2] != 0) 
     							&& currentBoard[i][j] > 0) {
-    						if (currentBoard[i][j] == currentBoard[i][j+1]) {
-    							currentBoard[i][j+1] = 2*currentBoard[i][j+1];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
     						// because board(i,j) > 0 this detects a 1 and 2
     						if (currentBoard[i][j] + currentBoard[i][j+1] == 3) {
     							currentBoard[i][j+1] = 3;
     							currentBoard[i][j] = 0;
     							break;
+    						} else if (currentBoard[i][j] > 2 && 
+    								currentBoard[i][j] == currentBoard[i][j+1]) {
+    							currentBoard[i][j+1] = 2*currentBoard[i][j+1];
+    							currentBoard[i][j] = 0;
+    							break;
     						}
+    						
     					}
     				}
     				// move everything right if there is a zero adjacent

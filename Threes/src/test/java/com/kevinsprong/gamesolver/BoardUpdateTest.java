@@ -38,7 +38,7 @@ public class BoardUpdateTest {
 		int[][] resultBoard = newState.getBoardState();
 
 		// check against truth
-		int[][] truthBoard = {{3,3,0,0},{0,3,6,0},{0,0,192,0},{192,0,0,0}};	
+		int[][] truthBoard = {{3,3,0,0},{3,6,0,0},{0,0,192,0},{192,0,0,0}};	
 		for (int i = 0; i < 4; i++) {
 			assertArrayEquals(truthBoard[i], resultBoard[i]);
 		}

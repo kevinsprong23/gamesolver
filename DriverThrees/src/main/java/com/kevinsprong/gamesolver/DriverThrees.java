@@ -10,7 +10,7 @@ public class DriverThrees
     public static void main( String[] args )
     {
         // make a new game
-    	TwoPlayerGame game = new Threes("AlphaBeta", "DefaultComputer");
+    	Threes game = new Threes("AlphaBeta", "DefaultComputer");
     	game.setSearchPly(7);
     	game.initializeBoard();
     	

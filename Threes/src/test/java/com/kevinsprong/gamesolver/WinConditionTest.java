@@ -69,7 +69,7 @@ public class WinConditionTest {
 	}
 	@Test
 	public void TestPlayer2Win2() {
-		int[][] testBoard = {{3072,3,2,3},{1536,2,3,2},{96,3,24,48},{96,192,384,192}};
+		int[][] testBoard = {{3072,3,2,3},{1536,2,3,2},{96,3,24,48},{768,192,384,192}};
 		game.getGameState().setBoardState(testBoard);
 		game.getGameState().setPlayerToMove(1);
 		int winStatus = game.determineWinner();
