@@ -30,13 +30,21 @@ public class SingleBoardSolver {
 		System.out.println(Arrays.toString(gs.getBoardState()[2]));
 		System.out.println(Arrays.toString(gs.getBoardState()[3]));
 		
-		
+
 		// solve the board
 		game.playerMove();
 		game.updateGameState();	
-		
+
 		// update
+		System.out.println(System.getProperty("line.separator"));
 		System.out.println("Best move: " + gs.getP1PreviousMove());
+		System.out.println(System.getProperty("line.separator"));
+		System.out.println("Updated Board: ");
+
+		for (int[] row : game.getGameState().getBoardState()) {
+			System.out.println("{" + row[0] + "," + row[1] + 
+					"," + row[2] + "," + row[3] + "},");
+		}
 
     }
 }

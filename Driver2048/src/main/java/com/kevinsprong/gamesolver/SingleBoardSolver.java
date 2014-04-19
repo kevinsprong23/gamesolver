@@ -17,10 +17,10 @@ public class SingleBoardSolver
     	game.setHeuristicWeights(new double[]{500, 2.2, 4.6, 0});
     	
     	int[][] inputBoard = {
-    			{0,4,16,32},
-    			{8,16,0,0},
-    			{4,0,0,0},
-    			{2,0,0,2}
+    			{8,32,64,256},
+    			{0,4,8,16},
+    			{0,0,0,0},
+    			{0,2,0,2},
     			};
     	
     	
@@ -39,7 +39,16 @@ public class SingleBoardSolver
 		game.updateGameState();	
 		
 		// update
+		System.out.println(System.getProperty("line.separator"));
 		System.out.println("Best move: " + gs.getP1PreviousMove());
+		System.out.println(System.getProperty("line.separator"));
+		System.out.println("Updated Board: ");
+		
+		for (int[] row : game.getGameState().getBoardState()) {
+			System.out.println("{" + row[0] + "," + row[1] + 
+					"," + row[2] + "," + row[3] + "},");
+		}
+		
 
     }
 }
