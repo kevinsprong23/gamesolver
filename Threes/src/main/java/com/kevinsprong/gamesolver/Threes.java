@@ -192,7 +192,8 @@ public class Threes extends TwoPlayerGame {
     			for (int j = 0; j < 4; j++) {
     				// find and perform collision
     				for (int i = 1; i < 4; i++) {
-    					if (currentBoard[i][j] > 0) {
+    					if ((i == 1 || currentBoard[i-2][j] != 0) 
+    							&& currentBoard[i][j] > 0) {
     						if (currentBoard[i][j] == currentBoard[i-1][j]) {
     							currentBoard[i-1][j] = 2*currentBoard[i-1][j];
     							currentBoard[i][j] = 0;
@@ -219,7 +220,8 @@ public class Threes extends TwoPlayerGame {
     			for (int j = 0; j < 4; j++) {
     				// find and perform collision
     				for (int i = 2; i >= 0; i--) {
-    					if (currentBoard[i][j] > 0) {
+    					if ((i == 2 || currentBoard[i+2][j] != 0) 
+    							&& currentBoard[i][j] > 0) {
     						if (currentBoard[i][j] == currentBoard[i+1][j]) {
     							currentBoard[i+1][j] = 2*currentBoard[i+1][j];
     							currentBoard[i][j] = 0;
@@ -246,7 +248,8 @@ public class Threes extends TwoPlayerGame {
     			for (int i = 0; i < 4; i++) {
     				// find and perform collision
     				for (int j = 1; j < 4; j++) {
-    					if (currentBoard[i][j] > 0) {
+    					if ((j == 1 || currentBoard[i][j-2] != 0) 
+    							&& currentBoard[i][j] > 0) {
     						if (currentBoard[i][j] == currentBoard[i][j-1]) {
     							currentBoard[i][j-1] = 2*currentBoard[i][j-1];
     							currentBoard[i][j] = 0;
@@ -273,7 +276,8 @@ public class Threes extends TwoPlayerGame {
     			for (int i = 0; i < 4; i++) {
     				// find and perform collision
     				for (int j = 2; j >= 0; j--) {
-    					if (currentBoard[i][j] > 0) {
+    					if ((j == 2 || currentBoard[i][j+2] != 0) 
+    							&& currentBoard[i][j] > 0) {
     						if (currentBoard[i][j] == currentBoard[i][j+1]) {
     							currentBoard[i][j+1] = 2*currentBoard[i][j+1];
     							currentBoard[i][j] = 0;

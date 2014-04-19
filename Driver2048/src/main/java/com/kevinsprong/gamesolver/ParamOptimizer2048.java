@@ -15,12 +15,12 @@ public class ParamOptimizer2048 {
     	String resultsFilePath = "ParameterSearch2048Refine.csv";
     	
     	// num sims per parameter setting
-    	int numTrials = 20;
+    	int numTrials = 30;
     	
     	// sim parameters
     	double [] winRange = {500, 500, 1};
-    	double [] monoRange =  {2, 2, 1};
-    	double [] smoothRange =  {4, 6, 0.2};
+    	double [] monoRange =  {1.8, 2.3, 0.2};
+    	double [] smoothRange =  {4.6, 5.3, 0.2};
     	double [] openRange =  {0, 0, 1};
     	ArrayList<Double> winVec = new ArrayList<Double>();
     	ArrayList<Double> monoVec = new ArrayList<Double>();
