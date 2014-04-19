@@ -18,10 +18,26 @@ public class AlphaBetaSolver {
 		// get the game state and solver parameters
 		GameState currentGameState = GameState.copyGameState(game.getGameState());
 		int searchPly = game.getSearchPly();
+		int searchTime = game.getSearchTime();
 		
-		MoveNode originNode = new MoveNode(currentGameState, searchPly);
-		double moveEval = alphaBeta(game, originNode, searchPly, true);
+		// iddfs algorithm, or fixed ply, depending on param values
+		int thisPly = 0;
+		long startTime = System.nanoTime();
+		long endTime = 0;
+		int timeElapsed = 0;
+		MoveNode originNode = null;
+		double moveEval = 0;
 		
+		while (timeElapsed < searchTime && thisPly <= searchPly) {
+			// solve it
+			thisPly += 1;
+			originNode = new MoveNode(currentGameState, thisPly);
+			moveEval = alphaBeta(game, originNode, thisPly, true);
+			
+			// time it
+			endTime = System.nanoTime();
+			timeElapsed = (int) ((int) (endTime - startTime) / 1e6);
+		}
 		// find the move that produced the best evaluation
 		for (MoveNode child : originNode.getNodeChildren()) {
 			if (child.getBeta() == moveEval) {

@@ -82,6 +82,7 @@ public abstract class TwoPlayerGame {
  	}
  	public void setSearchPly(int searchPlyIn) {
  		this.searchPly= searchPlyIn;
+ 		this.searchTime= (int) 2e9; // set to an absurdly high value
  	}
  	// get/set for searchTime
  	public int getSearchTime() {
@@ -89,6 +90,7 @@ public abstract class TwoPlayerGame {
  	}
  	public void setSearchTime(int searchTimeIn) {
  		this.searchTime= searchTimeIn;
+ 		this.searchPly= 2000; // set to an absurdly high value
  	}
     // get/set for win condition
   	public int getWinCondition() {

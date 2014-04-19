@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 import java.util.Set;
 
 /**
@@ -13,6 +14,7 @@ import java.util.Set;
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
 	private double[] heuristicWeights = {5000, 2.2, 5.2, 10};
+	public Scanner input;
 	
 	// getter and setter
 	public double[] getHeuristicWeights() {
@@ -29,7 +31,6 @@ public class Threes extends TwoPlayerGame {
     	this.setP2MoveStrat("DefaultComputer");
     	// solver parameters
     	this.setSearchPly(6);  
-        this.setSearchTime(10000);  // milliseconds
         this.setWinCondition(6144);
         
         // initialize game state
@@ -46,7 +47,6 @@ public class Threes extends TwoPlayerGame {
     	this.setP2MoveStrat(p2Strat);
     	// solver parameters
         this.setSearchPly(6);  
-        this.setSearchTime(10000);  // milliseconds
         this.setWinCondition(6144);
         
         // initialize game state
@@ -58,11 +58,10 @@ public class Threes extends TwoPlayerGame {
     	
     }
     
-    public Threes(String p1Strat, String p2Strat, int searchPly, int searchTime) {
+    public Threes(String p1Strat, String p2Strat, int searchTime) {
     	this.setP1MoveStrat(p1Strat);
     	this.setP2MoveStrat(p2Strat);
     	// solver parameters
-        this.setSearchPly(searchPly);  
         this.setSearchTime(searchTime);  // milliseconds
         this.setWinCondition(6144);
         
@@ -75,11 +74,10 @@ public class Threes extends TwoPlayerGame {
     }
     
     public Threes(String p1Strat, String p2Strat, 
-    		int searchPly, int searchTime, int winCondition) {
+    		int searchTime, int winCondition) {
     	this.setP1MoveStrat(p1Strat);
     	this.setP2MoveStrat(p2Strat);
     	// solver parameters
-        this.setSearchPly(searchPly);  
         this.setSearchTime(searchTime);  // milliseconds
         this.setWinCondition(winCondition); // get to this number to win!
         
@@ -174,7 +172,10 @@ public class Threes extends TwoPlayerGame {
     	        
     	        // instead of return statement
     	        currentState.setP2PreviousMove(Integer.toString(pt1) + "_" + Integer.toString(pt1y) + "_" + Integer.toString(pt1x));          
-    		}	
+    		} else if (p2Strat.equals("UserInput")) { // prompt user for the phone move
+    			System.out.print("Enter the computer's move as tile_rowidx_colidx: ");
+    			currentState.setP2PreviousMove(this.input.next());  
+    		}
     	}
     	
     }

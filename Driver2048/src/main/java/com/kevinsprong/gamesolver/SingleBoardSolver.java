@@ -12,15 +12,15 @@ public class SingleBoardSolver
         // make a new game
     	TwoZeroFourEight game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
     	
-    	game.setSearchPly(7);
+    	game.setSearchPly(8);
     	game.setWinCondition(8192);
     	game.setHeuristicWeights(new double[]{500, 2.2, 4.6, 0});
     	
     	int[][] inputBoard = {
-    			{8,32,64,256},
-    			{0,4,8,16},
-    			{0,0,0,0},
-    			{0,2,0,2},
+    			{0,0,0,4},
+    			{0,2,16,32},
+    			{2,4,256,512},
+    			{0,8,32,4},
     			};
     	
     	

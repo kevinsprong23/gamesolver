@@ -1,16 +1,16 @@
 package com.kevinsprong.gamesolver;
 
 import java.util.Arrays;
+import java.util.Scanner;
 
 /**
  * Class to play one (or many) game(s) of Threes
  */
-public class DriverThrees
-{
-    public static void main( String[] args )
-    {
+public class DriverThrees {
+    public static void main( String[] args ) {
         // make a new game
     	Threes game = new Threes("AlphaBeta", "DefaultComputer");
+    	game.input = new Scanner(System.in);
     	game.setSearchPly(7);
     	game.initializeBoard();
     	
@@ -50,6 +50,7 @@ public class DriverThrees
     		System.out.println(Arrays.toString(gs.getBoardState()[2]));
     		System.out.println(Arrays.toString(gs.getBoardState()[3]));
     	}
+    	game.input.close();
     	
     	System.out.println("Player " + winStatus + " wins!  Final Score " + 
     				game.getGameState().getGameScore());
