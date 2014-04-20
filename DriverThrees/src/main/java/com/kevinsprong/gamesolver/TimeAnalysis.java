@@ -139,6 +139,7 @@ public class TimeAnalysis {
 						Double.toString(avgScore) + "," +
 						Double.toString(avgMoveNum) + newline
 					);
+			writer.flush();
 		}
 		double elapsedTime = (double) (System.nanoTime() - startTime) / 1e9;
 		System.out.println("Done!  Time Elapsed: " + 

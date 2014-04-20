@@ -14,7 +14,7 @@ public class ParamOptimizer2048 {
     	String resultsFilePath = "ParameterSearch2048Initial.csv";
     	
     	// num sims per parameter setting
-    	int numTrials = 20;
+    	int numTrials = 10;
     	
     	// sim parameters
     	double [] winRange = {0, 500, 500};
@@ -146,6 +146,7 @@ public class ParamOptimizer2048 {
     							Integer.toString(highestTile) + "," +
     							Double.toString(avgScore) + newline
     							);
+    					writer.flush();
     				}
     			}
     		}

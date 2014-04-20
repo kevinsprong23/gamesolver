@@ -146,6 +146,7 @@ public class ParamOptimizerThrees {
     							Integer.toString(highestTile) + "," +
     							Double.toString(avgScore) + newline
     							);
+    					writer.flush();
     				}
     			}
     		}
