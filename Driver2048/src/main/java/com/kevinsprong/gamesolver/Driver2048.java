@@ -11,13 +11,14 @@ public class Driver2048 {
         // make a new game
     	TwoZeroFourEight game = new TwoZeroFourEight("AlphaBeta", "UserInput");
     	game.input = new Scanner(System.in);
-    	game.setSearchPly(8);
+    	game.setSearchTime(100);
+    	game.setWinCondition(4096);
     	game.initializeBoard();
     	game.getGameState().setBoardState(new int[][]{
-    			{128, 8, 8, 4},
-    			{256, 8, 2, 0},
-    			{1024, 4, 0, 0},
-    			{64, 0, 0, 0}
+    			{0,2,0,0},
+    			{0,32,2,512},
+    			{4,2,32,2048},
+    			{0,2,64,4}
     			});
     	
     	// debug printing
