@@ -17,10 +17,10 @@ public class ParamOptimizer2048 {
     	int numTrials = 10;
     	
     	// sim parameters
-    	double [] winRange = {0, 500, 500};
-    	double [] monoRange =  {0, 5, 1};
-    	double [] smoothRange =  {0, 5, 1};
-    	double [] openRange =  {0, 0, 1};
+    	double [] winRange = {0, 500.1, 500};
+    	double [] monoRange =  {0, 6.1, 2};
+    	double [] smoothRange =  {0, 6.1, 2};
+    	double [] openRange =  {0, 1.1, 1};
     	ArrayList<Double> winVec = new ArrayList<Double>();
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();
@@ -100,7 +100,7 @@ public class ParamOptimizer2048 {
     						
     						// create a new game
     						game = new TwoZeroFourEight("AlphaBeta", "DefaultComputer");
-    						game.setSearchPly(7);
+    						game.setSearchPly(6);
     						game.setWinCondition(65536);
     						game.setHeuristicWeights(new double[]{wR, mR, sR, oR});
     						game.initializeBoard();
