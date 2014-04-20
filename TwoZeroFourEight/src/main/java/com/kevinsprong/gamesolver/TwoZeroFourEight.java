@@ -574,7 +574,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
 							scores[1] += logb(vec[i], 2) - logb(vec[j], 2);
 						}
 						if (vec[j] >= vec[i]) { // forward dir
-							scores[1] += logb(vec[j], 2) - logb(vec[i], 2);
+							scores[0] += logb(vec[j], 2) - logb(vec[i], 2);
 						}
 						break;
 					}

@@ -8,24 +8,24 @@ import java.util.ArrayList;
 /**
  * Class to play one (or many) game(s) of 2048 using the TwoZeroFourEight class
  */
-public class PlyAnalysis {
+public class TimeAnalysis {
 	public static void main( String[] args ) throws IOException {
 		
+		// output file
 		String resultsFilePath = "TimeAnalysisThrees.csv";
-		
 		// num sims per parameter setting
-		int numTrials = 20;
+		int numTrials = 30;
 
 		// sim parameters
-		double [] plyRange = {1, 10, 1};
+		int [] timeRange = {0, 100, 10};
 
-		ArrayList<Double> plyVec = new ArrayList<Double>();
+		ArrayList<Integer> timeVec = new ArrayList<Integer>();
 
-		for (double pR = plyRange[0]; pR <= plyRange[1]; pR += plyRange[2]) {
-			plyVec.add(pR);
+		for (int tR = timeRange[0]; tR <= timeRange[1]; tR += timeRange[2]) {
+			timeVec.add(tR);
 		}
 
-		int totalNumSettings = plyVec.size();
+		int totalNumSettings = timeVec.size();
 
 		// variables to hold game info
 		Threes game;
@@ -37,49 +37,56 @@ public class PlyAnalysis {
 		// variables to hold sim results
 		int highestTile = 0;
 		int[] winRecord = new int[numTrials];
+		int[] bigWinRecord = new int[numTrials];
 		int[] highTiles = new int[numTrials];
 		int[] scores  = new int[numTrials];
 		int[] moveNums = new int[numTrials];
 		double avgWinPct;
+		double bigWinPct;
 		double avgHighTile;
 		double avgScore;
         double avgMoveNum;
         
 		// file to write to
-    	File resultsFile = new File(resultsFilePath);
-    	System.out.println(resultsFile.getCanonicalPath());
-    	FileWriter writer = new FileWriter(resultsFile);
-    	// print header
-    	String newline = System.getProperty("line.separator");
-		writer.write("ply,avgWinPct,avgHighTile,highTile,avgScore,avgMoveNum" +
+		File resultsFile = new File(resultsFilePath);
+		System.out.println(resultsFile.getCanonicalPath());
+		FileWriter writer = new FileWriter(resultsFile);
+		// print header
+		String newline = System.getProperty("line.separator");
+		writer.write("searchTime,avgWinPct,avgBigWinPct, avgHighTile,highTile,avgScore,avgMoveNum" +
 				newline);
 
 		// loop to optimize parameters
 		long startTime = System.nanoTime();
 		int thisSetting = 0;
-		for (double pR : plyVec) {
+		for (int tR : timeVec) {
 
 			thisSetting++;
 
 			// reset results vectors
 			highestTile = 0;
 			winRecord = new int[numTrials];
+			bigWinRecord = new int[numTrials];
 			highTiles = new int[numTrials];
 			scores  = new int[numTrials];
 			moveNums = new int[numTrials];
 
 			for (int k = 0; k < numTrials; k++) {
 
-				System.out.println(Double.toString(pR) + ", " +
+				System.out.println(Double.toString(tR) + ", " +
 					" Setting " + thisSetting + 
 					" of " + totalNumSettings + 
 					", Trial " + Integer.toString(k+1));
 
 				// create a new game
-				game = new Threes("AlphaBeta", "DefaultComputer");
-				game.setSearchPly(7);
+				if (tR == 0) {
+					game = new Threes("Random", "DefaultComputer");
+				} else {
+					game = new Threes("AlphaBeta", "DefaultComputer");
+				}
+				game.setSearchTime(tR);
 				game.setWinCondition(65536);
-				game.setHeuristicWeights(new double[]{500, 1, 10, 10});
+				game.setHeuristicWeights(new double[]{500, 2.2, 4.6, 0});
 				game.initializeBoard();
 
 				// play the game until there is a winner
@@ -103,22 +110,30 @@ public class PlyAnalysis {
 				scores[k] = (int) score;
 				highTiles[k] = highTile;
 				moveNums[k] = (int) moveNum;
-				if (highTile >= 2048) {
+				if (highTile >= 4096) {
+					bigWinRecord[k] = 1;
+					winRecord[k] = 1;
+				} else if (highTile >= 2048) {
+					bigWinRecord[k] = 0;
 					winRecord[k] = 1;
 				} else {
+					bigWinRecord[k] = 0;
 					winRecord[k] = 0;
 				}
+				
 			}
 
 			// summarize trials and write to file
 			avgWinPct = calculateAverage(winRecord);
+			bigWinPct = calculateAverage(bigWinRecord);
 			avgHighTile = calculateAverage(highTiles);
 			avgScore = calculateAverage(scores);
 			avgMoveNum = calculateAverage(moveNums);
 
 			writer.write(
-					Double.toString(pR) + "," +
+					Double.toString(tR) + "," +
 						Double.toString(avgWinPct) + "," +
+						Double.toString(bigWinPct) + "," +
 						Double.toString(avgHighTile) + "," +
 						Integer.toString(highestTile) + "," +
 						Double.toString(avgScore) + "," +

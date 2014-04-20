@@ -1,6 +1,5 @@
 package com.kevinsprong.gamesolver;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -12,15 +11,15 @@ import java.util.ArrayList;
 public class ParamOptimizer2048 {
     public static void main( String[] args ) throws IOException {
     	// out file location
-    	String resultsFilePath = "ParameterSearch2048RefineMore.csv";
+    	String resultsFilePath = "ParameterSearch2048Initial.csv";
     	
     	// num sims per parameter setting
     	int numTrials = 20;
     	
     	// sim parameters
-    	double [] winRange = {500, 500, 1};
-    	double [] monoRange =  {2.0, 2.21, 0.05};
-    	double [] smoothRange =  {4.6, 4.81, 0.05};
+    	double [] winRange = {0, 500, 500};
+    	double [] monoRange =  {0, 5, 1};
+    	double [] smoothRange =  {0, 5, 1};
     	double [] openRange =  {0, 0, 1};
     	ArrayList<Double> winVec = new ArrayList<Double>();
     	ArrayList<Double> monoVec = new ArrayList<Double>();
@@ -57,11 +56,11 @@ public class ParamOptimizer2048 {
     	double avgScore;
     	
     	// file to write to
-    	BufferedWriter writer = null;
     	File resultsFile = new File(resultsFilePath);
-    	String newline = System.getProperty("line.separator");
     	System.out.println(resultsFile.getCanonicalPath());
-    	writer = new BufferedWriter(new FileWriter(resultsFile));
+    	FileWriter writer = new FileWriter(resultsFile);
+    	// print header
+    	String newline = System.getProperty("line.separator");
     	writer.write("win,mono,smooth,open,avgWinPct,avgHighTile,highTile,avgScore" +
     							newline);
 
@@ -78,7 +77,7 @@ public class ParamOptimizer2048 {
     					if (mR == 0 && sR == 0 && oR == 0) {
     						mR = 1;
     						sR = 1;
-    						oR = 1;
+    						oR = 0;
     					}		
     					
     					highestTile = 0;
