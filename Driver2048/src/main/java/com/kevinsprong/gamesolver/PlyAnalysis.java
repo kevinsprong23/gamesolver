@@ -53,7 +53,7 @@ public class PlyAnalysis {
 		FileWriter writer = new FileWriter(resultsFile);
 		// print header
 		String newline = System.getProperty("line.separator");
-		writer.write("ply,avgWinPct,avgBigWinPct, avgHighTile,highTile,avgScore,avgMoveNum" +
+		writer.write("ply,avgWinPct,avgBigWinPct,avgHighTile,highTile,avgScore,avgMoveNum" +
 				newline);
 
 		// loop to optimize parameters
