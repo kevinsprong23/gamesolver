@@ -601,9 +601,20 @@ public class Threes extends TwoPlayerGame {
     				for (int k = i+1; k < 4; k++) { 
     					// check smoothness versus first non-zero tile
     					if (board[k][j] != 0) {
-    						totalDeviation += Math.abs(logb(board[i][j], 2) - 
-    								logb(board[k][j], 2));
-    						break;
+    						if (board[i][j] + board[k][j] == 3) {
+	    						totalDeviation += 0;
+	    					} else if ((board[i][j] == 1 &&  board[k][j] == 1) || 
+	    							(board[i][j] == 2 &&  board[k][j] == 2)) {
+	    						totalDeviation += 1; // generous; assumes they only need one merge to merge with each other
+	    					} else if ((board[i][j] + board[k][j]) % 3 > 0) {
+	    						// treat the merge as a 3 with the multiple above
+	    						// other num
+	    						totalDeviation += logb(2*Math.max(board[k][j], 
+	    								board[i][j])/3, 2);
+	    					} else {
+	    						totalDeviation += Math.abs(logb(board[i][j]/3, 2)- 
+	    								logb(board[k][j]/3, 2));	
+	    					}
     					}
     				}   				
     			}	
@@ -613,7 +624,7 @@ public class Threes extends TwoPlayerGame {
 
 
     	//---------------------------------------------------------------------
-    	// Heuristic 4:  proximity of the 1's to the 2's
+    	// Heuristic 4:  open tiles
 
     	double openTiles = 0;
     	for (int i = 0; i < 4; i++) {
@@ -641,11 +652,19 @@ public class Threes extends TwoPlayerGame {
     	int vecj = 0;
 		for (int i = 0; i < vec.length-1; i++) {
 			if (vec[i] > 0) {
-				veci = Math.max(vec[i],3); // consider 1's and 2's as 3 for this metric
+				if (vec[i] < 3) {
+					veci = 3; // consider 1's and 2's as 3 for this metric
+				} else {
+					veci = vec[i]*2; // consider 3's as next mult up
+				}
 				// find next non-zero element
 				for (int j = i+1; j < vec.length; j++) {
 					if (vec[j] > 0) {
-						vecj = Math.max(vec[j],3); // consider 1's and 2's as 3 for this metric
+						if (vec[j] < 3) {
+							vecj = 3; // consider 1's and 2's as 3 for this metric
+						} else {
+							vecj = vec[j]*2; // consider 3's as next mult up
+						}
 						if (veci >= vecj) { // reverse dir
 							scores[1] += logb(veci/3, 2) - logb(vecj/3, 2);
 						}
