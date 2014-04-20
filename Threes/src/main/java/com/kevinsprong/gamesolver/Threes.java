@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {5000, 2, 4, 0};
+	private double[] heuristicWeights = {5000, 2, 3, 0};
 	public Scanner input;
 	
 	// getter and setter
@@ -161,7 +161,6 @@ public class Threes extends TwoPlayerGame {
     		}
     	} else {
     		if (p2Strat.equals("DefaultComputer")) { // choose a tile at random
-    			// update all of this with threes logic
     			
     			// choose which number(s) we will get
     	    	int pt1 = this.generateNewCell();
@@ -198,6 +197,7 @@ public class Threes extends TwoPlayerGame {
     		
     		// update depending on move
     		if (move.equals("U")) {
+    			currentState.setP1PreviousMove("U");
     			// move everything up one tile, collide at top.  one collision per move
     			for (int j = 0; j < 4; j++) {
     				// find and perform collision
@@ -227,6 +227,7 @@ public class Threes extends TwoPlayerGame {
     				}
     			}
     		} else if (move.equals("D")) {
+    			currentState.setP1PreviousMove("D");
     			// move everything down one tile, collide at bottom.  one collision per move
     			for (int j = 0; j < 4; j++) {
     				// find and perform collision
@@ -256,6 +257,7 @@ public class Threes extends TwoPlayerGame {
     				}
     			}
     		} else if (move.equals("L")) {
+    			currentState.setP1PreviousMove("L");
     			// move everything left one tile, collide at left.  one collision per move
     			for (int i = 0; i < 4; i++) {
     				// find and perform collision
@@ -285,6 +287,7 @@ public class Threes extends TwoPlayerGame {
     				}
     			}
     		} else if (move.equals("R")) {
+    			currentState.setP1PreviousMove("R");
     			// move everything right one tile, collide at right.  one collision per move
     			for (int i = 0; i < 4; i++) {
     				// find and perform collision
@@ -335,12 +338,12 @@ public class Threes extends TwoPlayerGame {
         	for (int j = 0; j < 12; j++) {
         		if (moveList[j] > 0) {
         			moveList[j] = 0;
+        			if (j == 11) { // array is all zeros; reset move stack
+            			currentState.setMoveStack(this.generateNewMoveStack());
+            		}
         			break;
         		}
-        		if (moveList[j] == 11) { // array is all zeros; reset move stack
-        			currentState.setMoveStack(this.generateNewMoveStack());
-        			break;
-        		}
+        		
         	}
     		
     	}
@@ -437,8 +440,16 @@ public class Threes extends TwoPlayerGame {
 	    	// opposite P1's move
 	    	// parse moveStack
 	    	List<Integer> uniqueMoves = new ArrayList<Integer>();
-	    	int topMove = this.getGameState().getMoveStack()[1];
+	    	int[] moveStack = this.getGameState().getMoveStack();
+	    	int topMove = 0;
+	    	for (int j = 0; j < moveStack.length; j++) {
+	    		if (moveStack[j] > 0) {
+	    			topMove = moveStack[j];
+	    			break;
+	    		}
+	    	}
 	    	uniqueMoves.add(topMove);
+	    	
 	    	for (int bonus : this.findBonusMoves()) {
 	    		uniqueMoves.add(bonus);
 	    	}
@@ -689,9 +700,11 @@ public class Threes extends TwoPlayerGame {
 	// generate new tile for the game
     public int generateNewCell() {
     	int rand = this.randIntInRange(1,21);
+    	int maxTile = this.getMaxTile(this.getGameState());
     	int output = 0;
     	// 1/21 to return a bonus tile
-    	if (rand == 1) {
+    	
+    	if (rand == 1 && maxTile >= 48) {
     		int[] bonusMoves = this.findBonusMoves();
     		int bidx = randIntInRange(0, bonusMoves.length-1);
     		output = bonusMoves[bidx];

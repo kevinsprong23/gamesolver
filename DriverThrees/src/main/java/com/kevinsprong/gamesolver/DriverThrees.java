@@ -33,7 +33,7 @@ public class DriverThrees {
     	while (winStatus == 0) {
     		// move player who is currently to move;
     		game.playerMove();
-    		game.updateGameState();	
+    		game.updateGameState();
     		winStatus = game.determineWinner();
     		
     		// debug printing

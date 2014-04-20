@@ -25,7 +25,7 @@ public class GameState {
     	this.setGameEval(0);
     	this.setGameScore(0);
     	this.setMoveNum(0);
-    	this.setMoveStack(null); 
+    	this.setMoveStack(new int[]{}); 
     }
     
     // create a copy of a game state to avoid in-function modifications
@@ -38,15 +38,24 @@ public class GameState {
     	for (int i = 0; i < boardOrig.length; i++) {
     		boardNew[i] = Arrays.copyOf(boardOrig[i], boardOrig[i].length);
     	}
-    	
     	gsOut.setBoardState(boardNew); 
+    	// copy of primitives is straightforward
     	gsOut.setPlayerToMove(gameStateIn.getPlayerToMove()); 
     	gsOut.setP1PreviousMove(gameStateIn.getP1PreviousMove()); 
     	gsOut.setP2PreviousMove(gameStateIn.getP2PreviousMove()); 
     	gsOut.setGameEval(gameStateIn.getGameEval()); 
     	gsOut.setGameScore(gameStateIn.getGameScore()); 
     	gsOut.setMoveNum(gameStateIn.getMoveNum()); 
-    	gsOut.setMoveStack(gameStateIn.getMoveStack()); 
+    	// deep copy of move stack
+    	int[] moveStackOld = gameStateIn.getMoveStack();
+    	if (moveStackOld.length > 0) {
+    		int[] moveStackNew = new int[moveStackOld.length];
+    		for (int i = 0; i < moveStackOld.length; i++) {
+        		moveStackNew[i] = moveStackOld[i];
+        	}
+    		gsOut.setMoveStack(moveStackNew);
+    	}
+    	
      		
     	return gsOut;
     }

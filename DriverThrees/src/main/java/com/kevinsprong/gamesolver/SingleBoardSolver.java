@@ -10,8 +10,8 @@ public class SingleBoardSolver {
         // make a new game
     	Threes game = new Threes("AlphaBeta", "DefaultComputer");
     	
-    	game.setSearchPly(7);
-    	game.setWinCondition(8192);
+    	game.setSearchTime(100);
+    	game.setWinCondition(6144);
     	
     	int[][] inputBoard = {
     			{1,2,2,3},
