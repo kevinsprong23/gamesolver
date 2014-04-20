@@ -169,8 +169,7 @@ public class Threes extends TwoPlayerGame {
     	    	ArrayList<int[]> zeroList = this.getValidComputerMoveTiles(currentState);
     	    	
     	    	// choose random location for tile from among zero indices
-    	        int randomNum1 = Math.max(3, 
-    	        		this.randIntInRange(0, zeroList.size()-1));
+    	        int randomNum1 = this.randIntInRange(0, zeroList.size()-1);
     	        int pt1y = zeroList.get(randomNum1)[0];
     	        int pt1x = zeroList.get(randomNum1)[1];
     	        
@@ -371,6 +370,10 @@ public class Threes extends TwoPlayerGame {
     	if (playerMoved == 1) {
     		newGameState.setMoveNum(newGameState.getMoveNum() + 1);
     	}
+    	
+    	// update the score
+    	this.updateGameScore(newGameState, 0); // second argument is nuisance for Threes
+    	
     	// calculate the move and update the official game state
     	this.setGameState(newGameState);
 	

@@ -11,7 +11,7 @@ public class DriverThrees {
         // make a new game
     	Threes game = new Threes("AlphaBeta", "DefaultComputer");
     	game.input = new Scanner(System.in);
-    	game.setSearchPly(7);
+    	game.setSearchTime(100);
     	game.initializeBoard();
     	
     	// debug printing
