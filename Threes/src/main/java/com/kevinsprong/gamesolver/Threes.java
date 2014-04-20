@@ -573,8 +573,20 @@ public class Threes extends TwoPlayerGame {
     				for (int k = j+1; k < 4; k++) { 
 	    				// check smoothness versus first non-zero tile
 	    				if (board[i][k] != 0) {
-	    					totalDeviation += Math.abs(logb(board[i][j], 2) - 
-	    							logb(board[i][k], 2));
+	    					if (board[i][j] + board[i][k] == 3) {
+	    						totalDeviation += 0;
+	    					} else if ((board[i][j] == 1 &&  board[i][k] == 1) || 
+	    							(board[i][j] == 2 &&  board[i][k] == 2)) {
+	    						totalDeviation += 1; // generous; assumes they only need one merge to merge with each other
+	    					} else if ((board[i][j] + board[i][k]) % 3 > 0) {
+	    						// treat the merge as a 3 with the multiple above
+	    						// other num
+	    						totalDeviation += logb(2*Math.max(board[i][k], 
+	    								board[i][j])/3, 2);
+	    					} else {
+	    						totalDeviation += Math.abs(logb(board[i][j]/3, 2)- 
+	    								logb(board[i][k]/3, 2));	
+	    					}
 	    					break;
 	    				}
 	    		    }   				
@@ -601,7 +613,7 @@ public class Threes extends TwoPlayerGame {
 
 
     	//---------------------------------------------------------------------
-    	// Heuristic 4:  the number of open tiles
+    	// Heuristic 4:  proximity of the 1's to the 2's
 
     	double openTiles = 0;
     	for (int i = 0; i < 4; i++) {
@@ -625,16 +637,20 @@ public class Threes extends TwoPlayerGame {
     // check monotonicity of a vector in log space ignoring zeros
     private int[] checkMonotonicity(int[] vec) {
     	int[] scores = {0,0}; // forward and reverse dir respectively
+    	int veci = 0;
+    	int vecj = 0;
 		for (int i = 0; i < vec.length-1; i++) {
 			if (vec[i] > 0) {
+				veci = Math.max(vec[i],3); // consider 1's and 2's as 3 for this metric
 				// find next non-zero element
 				for (int j = i+1; j < vec.length; j++) {
 					if (vec[j] > 0) {
-						if (vec[i] >= vec[j]) { // reverse dir
-							scores[1] += logb(vec[i], 2) - logb(vec[j], 2);
+						vecj = Math.max(vec[j],3); // consider 1's and 2's as 3 for this metric
+						if (veci >= vecj) { // reverse dir
+							scores[1] += logb(veci/3, 2) - logb(vecj/3, 2);
 						}
-						if (vec[j] >= vec[i]) { // forward dir
-							scores[1] += logb(vec[j], 2) - logb(vec[i], 2);
+						if (vecj >= veci) { // forward dir
+							scores[1] += logb(vecj/3, 2) - logb(veci/3, 2);
 						}
 						break;
 					}
