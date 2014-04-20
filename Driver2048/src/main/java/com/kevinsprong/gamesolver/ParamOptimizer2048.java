@@ -14,13 +14,13 @@ public class ParamOptimizer2048 {
     	String resultsFilePath = "ParameterSearch2048Initial.csv";
     	
     	// num sims per parameter setting
-    	int numTrials = 10;
+    	int numTrials = 20;
     	
     	// sim parameters
-    	double [] winRange = {0, 500.1, 500};
-    	double [] monoRange =  {0, 6.1, 2};
-    	double [] smoothRange =  {0, 6.1, 2};
-    	double [] openRange =  {0, 1.1, 1};
+    	double [] winRange = {500, 500, 1};
+    	double [] monoRange =  {2, 3.1, 0.2};
+    	double [] smoothRange =  {2.4, 3.81, 0.2};
+    	double [] openRange =  {0, 0, 1};
     	ArrayList<Double> winVec = new ArrayList<Double>();
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();

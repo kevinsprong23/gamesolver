@@ -10,7 +10,7 @@ import java.util.Scanner;
  */
 public class TwoZeroFourEight extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 2.2, 4.6, 0};
+	private double[] heuristicWeights = {500, 2, 3, 0};
 	public Scanner input;
 	
 	// getter and setter
