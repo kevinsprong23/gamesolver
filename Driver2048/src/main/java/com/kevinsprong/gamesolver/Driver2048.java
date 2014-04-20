@@ -12,14 +12,15 @@ public class Driver2048 {
     	TwoZeroFourEight game = new TwoZeroFourEight("AlphaBeta", "UserInput");
     	game.input = new Scanner(System.in);
     	game.setSearchTime(100);
-    	game.setWinCondition(4096);
+    	game.setWinCondition(8192);
     	game.initializeBoard();
-    	game.getGameState().setBoardState(new int[][]{
-    			{0,2,0,0},
-    			{0,32,2,512},
-    			{4,2,32,2048},
-    			{0,2,64,4}
+    	/*game.getGameState().setBoardState(new int[][]{
+    			{0,2,4,256},
+    			{0,0,128,2048},
+    			{0,0,16,256},
+    			{0,2,8,16}
     			});
+    	*/
     	
     	// debug printing
 		GameState gs = game.getGameState();
