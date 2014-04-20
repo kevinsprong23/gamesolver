@@ -1,6 +1,5 @@
 package com.kevinsprong.gamesolver;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,11 +48,11 @@ public class PlyAnalysis {
         double avgMoveNum;
         
 		// file to write to
-		BufferedWriter writer = null;
-		File resultsFile = new File(resultsFilePath);
-		String newline = System.getProperty("line.separator");
+		File resultsFile = new File(resultsFilePath);	
 		System.out.println(resultsFile.getCanonicalPath());
-		writer = new BufferedWriter(new FileWriter(resultsFile));
+		FileWriter writer = new FileWriter(resultsFile);
+		// print header
+		String newline = System.getProperty("line.separator");
 		writer.write("ply,avgWinPct,avgBigWinPct, avgHighTile,highTile,avgScore,avgMoveNum" +
 				newline);
 
