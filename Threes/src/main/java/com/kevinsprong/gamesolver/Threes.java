@@ -110,17 +110,17 @@ public class Threes extends TwoPlayerGame {
     	// generate random nums from 0 to 15 in loop, check against hash set, and make x/y
     	Set<Integer> randsChosen = new HashSet<Integer>();
     	int numsChosen = 0;
-    	while (numsChosen < 8) { // could do fewer checks for blank spaces and have fewer, but then indexing gets hard
+    	while (numsChosen < 9) { // could do fewer checks for blank spaces and have fewer, but then indexing gets hard
     		int randInt = this.randIntInRange(0, 15);
     		while (randsChosen.contains(randInt)) {
     			randInt = this.randIntInRange(0, 15);
     		}
     		// now that we have a distinct one, update counters
-    		numsChosen++;
     		randsChosen.add(randInt);
     		// assign to board indices
     		rows[numsChosen] = randInt % 4;
     		cols[numsChosen] = randInt / 4;
+    		numsChosen++;
     	}
          
     	
