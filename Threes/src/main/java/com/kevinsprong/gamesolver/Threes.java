@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {5000, 2.2, 5.2, 10};
+	private double[] heuristicWeights = {5000, 2, 4, 0};
 	public Scanner input;
 	
 	// getter and setter
@@ -110,11 +110,15 @@ public class Threes extends TwoPlayerGame {
     	// generate random nums from 0 to 15 in loop, check against hash set, and make x/y
     	Set<Integer> randsChosen = new HashSet<Integer>();
     	int numsChosen = 0;
-    	while (numsChosen < 9) { // could do fewer checks for blank spaces and have fewer, but then indexing gets hard
+    	while (numsChosen < 8) { // could do fewer checks for blank spaces and have fewer, but then indexing gets hard
     		int randInt = this.randIntInRange(0, 15);
     		while (randsChosen.contains(randInt)) {
     			randInt = this.randIntInRange(0, 15);
     		}
+    		// now that we have a distinct one, update counters
+    		numsChosen++;
+    		randsChosen.add(randInt);
+    		// assign to board indices
     		rows[numsChosen] = randInt % 4;
     		cols[numsChosen] = randInt / 4;
     	}
@@ -166,7 +170,8 @@ public class Threes extends TwoPlayerGame {
     	    	ArrayList<int[]> zeroList = this.getValidComputerMoveTiles(currentState);
     	    	
     	    	// choose random location for tile from among zero indices
-    	        int randomNum1 = this.randIntInRange(0, zeroList.size()-1);
+    	        int randomNum1 = Math.max(3, 
+    	        		this.randIntInRange(0, zeroList.size()-1));
     	        int pt1y = zeroList.get(randomNum1)[0];
     	        int pt1x = zeroList.get(randomNum1)[1];
     	        
@@ -463,25 +468,25 @@ public class Threes extends TwoPlayerGame {
     	String p1Move = gsIn.getP1PreviousMove();
     	if (p1Move.equals("U")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[3][i] > 0) {
+    			if (boardOrig[3][i] == 0) {
     				zeroList.add(new int[]{3,i});
     			}
     		}
     	} else if (p1Move.equals("D")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[0][i] > 0) {
+    			if (boardOrig[0][i] == 0) {
     				zeroList.add(new int[]{0,i});
     			}
     		}
     	} else if (p1Move.equals("L")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[i][3] > 0) {
+    			if (boardOrig[i][3] == 0) {
     				zeroList.add(new int[]{i,3});
     			}
     		}
     	} else if (p1Move.equals("R")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[i][0] > 0) {
+    			if (boardOrig[i][0] == 0) {
     				zeroList.add(new int[]{i,0});
     			}
     		}
@@ -747,7 +752,7 @@ public class Threes extends TwoPlayerGame {
     	}
     	
     	for (int i = 0; i < 12; i++) {
-    		newMoveStack[i] = doubleStackIndex[i] / 3 + 1; // integer division exploit to round the num down
+    		newMoveStack[i] = doubleStackIndex[i] / 4 + 1; // integer division exploit to round the num down
     	}
     	
     	return newMoveStack;
