@@ -12,12 +12,12 @@ public class TimeAnalysis {
 	public static void main( String[] args ) throws IOException {
 		
 		// output file
-		String resultsFilePath = "TimeAnalysis2048.csv";
+		String resultsFilePath = "TimeAnalysis2048_2.csv";
 		// num sims per parameter setting
 		int numTrials = 30;
 
 		// sim parameters
-		int [] timeRange = {0, 100, 10};
+		int [] timeRange = {80, 100, 10};
 
 		ArrayList<Integer> timeVec = new ArrayList<Integer>();
 
