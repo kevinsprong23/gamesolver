@@ -670,14 +670,13 @@ public class Threes extends TwoPlayerGame {
     }
     
     // dumb one; just maximize score
-    public double evaluateGameState(GameState gameStateIn) {
+    public double evaluateGameState1(GameState gameStateIn) {
     	this.updateGameScore(gameStateIn, 0);
     	return gameStateIn.getGameScore();
     }
     
-    // my version; uses similar logic to 2048
-    public double evaluateGameState1(GameState gameStateIn) {
-    	// update all of this with threes stuff
+    // my version; uses similar logic to 2048 evaluation
+    public double evaluateGameState(GameState gameStateIn) {
     	
     	int[][] board = gameStateIn.getBoardState();
     	
