@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 1, 8, 6};
+	private double[] heuristicWeights = {500, 1, 7, 6};
 	public Scanner input;
 	
 	// getter and setter
@@ -643,46 +643,18 @@ public class Threes extends TwoPlayerGame {
 
 
     	//---------------------------------------------------------------------
-    	// Heuristic 4:  pairwise blockages of ones and twos
+    	// Heuristic 4:  penalize ones and twos
 
-    	double uninterruptedPairs = 0;
+    	double smallNums = 0;
     	// probe rightward
     	for (int i = 0; i < 4; i++) {
-    		for (int j = 0; j < 3; j++) {
+    		for (int j = 0; j < 4; j++) {
     			if (board[i][j] == 1 || board[i][j] == 2) {
-    				for (int k = j+1; k < 4; k++) {
-    				    // if there is a 3-sum, incentivize it
-    					if (board[i][j] + board[i][k] == 3) {
-    						uninterruptedPairs += 1;
-    						break;
-    					}
-    					// if there is a blocking tile, just break
-    					if (board[i][k] >= 0) {
-    						break;
-    					}
-    				}
+    				smallNums += 1;
     			}
     		}
     	}
-    	// probe downward
-    	for (int j = 0; j < 4; j++) {
-    		for (int i = 0; i < 3; i++) {
-    			if (board[i][j] == 1 || board[i][j] == 2) {
-    				for (int k = i+1; k < 4; k++) {
-    				    // if there is a 3-sum, incentivize it
-    					if (board[i][j] + board[k][j] == 3) {
-    						uninterruptedPairs += 1;
-    						break;
-    					}
-    					// if there is a blocking tile, just break
-    					if (board[k][j] >= 0) {
-    						break;
-    					}
-    				}
-    			}
-    		}
-    	}
-    	heuristicVals[3] = uninterruptedPairs;
+    	heuristicVals[3] = -1 * smallNums;
     	
     	
     	//---------------------------------------------------------------------
@@ -763,7 +735,7 @@ public class Threes extends TwoPlayerGame {
     		int maxTileMult = (int) logb(maxTile / 8 / 3, 2);
     		bonusTiles = new int[maxTileMult];
     		for (int i = 1; i <= maxTileMult; i++) {
-    			bonusTiles[i-1] = (int) Math.pow(6, i);
+    			bonusTiles[i-1] = 3 * (int) Math.pow(2, i);
     		}
     		
     	}
