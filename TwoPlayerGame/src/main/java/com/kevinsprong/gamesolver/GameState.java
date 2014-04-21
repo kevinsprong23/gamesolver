@@ -1,6 +1,5 @@
 package com.kevinsprong.gamesolver;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 /*
@@ -15,7 +14,8 @@ public class GameState {
     private double gameScore;  // score if game supports it
     private double moveNum = 0;
     private int[] moveStack; // array instead of list for controlled ordered access
-
+    private int[] idxShift; // whether column/row moved last time
+    
     //constructor
     public GameState() {
     	this.setBoardState(null);
@@ -26,6 +26,7 @@ public class GameState {
     	this.setGameScore(0);
     	this.setMoveNum(0);
     	this.setMoveStack(new int[]{}); 
+    	this.setIdxShift(new int[]{}); 
     }
     
     // create a copy of a game state to avoid in-function modifications
@@ -55,7 +56,15 @@ public class GameState {
         	}
     		gsOut.setMoveStack(moveStackNew);
     	}
-    	
+    	// deep copy of idx shift
+    	int[] idxShiftOld = gameStateIn.getIdxShift();
+    	if (idxShiftOld.length > 0) {
+    		int[] idxShiftNew = new int[idxShiftOld.length];
+    		for (int i = 0; i < idxShiftOld.length; i++) {
+    			idxShiftNew[i] = idxShiftOld[i];
+        	}
+    		gsOut.setIdxShift(idxShiftNew);
+    	}
      		
     	return gsOut;
     }
@@ -119,4 +128,14 @@ public class GameState {
   			this.moveStack[i] = moveStackIn[i];
   		}
   	}
+  	// get/set for moveStack
+   	public int[] getIdxShift() {
+   		return this.idxShift;
+   	}
+   	public void setIdxShift(int[] idxShiftIn) {
+   		this.idxShift = new int[idxShiftIn.length];
+   		for (int i = 0; i < idxShiftIn.length; i++) {
+   			this.idxShift[i] = idxShiftIn[i];
+   		}
+   	}
 }

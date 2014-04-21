@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 2, 3, 4, 1};
+	private double[] heuristicWeights = {500, 0, 6, 0, 0};
 	public Scanner input;
 	
 	// getter and setter
@@ -188,9 +188,10 @@ public class Threes extends TwoPlayerGame {
     	
     	// give ourselves clean object to work with
     	GameState currentState = GameState.copyGameState(gameStateIn);
-    	
     	int[][] currentBoard = currentState.getBoardState();
     	int playerMoved = currentState.getPlayerToMove();
+    	
+    	int[] idxShift = {0,0,0,0};
 
     	if (playerMoved == 1) {
     		
@@ -222,6 +223,7 @@ public class Threes extends TwoPlayerGame {
     					if (currentBoard[i-1][j] == 0) {
     						currentBoard[i-1][j] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
+    						idxShift[j] = 1;
     					}
     				}
     			}
@@ -252,6 +254,7 @@ public class Threes extends TwoPlayerGame {
     					if (currentBoard[i+1][j] == 0) {
     						currentBoard[i+1][j] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
+    						idxShift[j] = 1;
     					}
     				}
     			}
@@ -282,6 +285,7 @@ public class Threes extends TwoPlayerGame {
     					if (currentBoard[i][j-1] == 0) {
     						currentBoard[i][j-1] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
+    						idxShift[i] = 1;
     					}
     				}
     			}
@@ -312,13 +316,15 @@ public class Threes extends TwoPlayerGame {
     					if (currentBoard[i][j+1] == 0) {
     						currentBoard[i][j+1] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
+    						idxShift[i] = 1;
     					}
     				}
     			}
     		}
     			
     		// assign new board back to game state
-    		currentState.setBoardState(currentBoard);	// unnec. due to obj pointer pass?
+    		currentState.setBoardState(currentBoard);	
+    		currentState.setIdxShift(idxShift);
     		
     	} else {
     		
@@ -478,29 +484,30 @@ public class Threes extends TwoPlayerGame {
     	
     	// get indices of open spaces along row/col opposite move
     	int[][] boardOrig = gsIn.getBoardState();
+    	int[] idxShift = gsIn.getIdxShift();
     	
     	String p1Move = gsIn.getP1PreviousMove();
     	if (p1Move.equals("U")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[3][i] == 0) {
+    			if (boardOrig[3][i] == 0 && idxShift[i] == 1 ) {
     				zeroList.add(new int[]{3,i});
     			}
     		}
     	} else if (p1Move.equals("D")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[0][i] == 0) {
+    			if (boardOrig[0][i] == 0 && idxShift[i] == 1) {
     				zeroList.add(new int[]{0,i});
     			}
     		}
     	} else if (p1Move.equals("L")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[i][3] == 0) {
+    			if (boardOrig[i][3] == 0 && idxShift[i] == 1) {
     				zeroList.add(new int[]{i,3});
     			}
     		}
     	} else if (p1Move.equals("R")) {
     		for (int i = 0; i < 4; i++) {
-    			if (boardOrig[i][0] == 0) {
+    			if (boardOrig[i][0] == 0 && idxShift[i] == 1) {
     				zeroList.add(new int[]{i,0});
     			}
     		}
@@ -726,7 +733,7 @@ public class Threes extends TwoPlayerGame {
         	totalStagger += thisStagger;	
     	}
 
-    	heuristicVals[3] = -1* totalStagger;
+    	heuristicVals[3] = -1 * totalStagger;
     	
     	//---------------------------------------------------------------------
     	// Heuristic 5:  incentivize open tiles
@@ -797,7 +804,7 @@ public class Threes extends TwoPlayerGame {
 							scores[1] += logb(veci/3, 2) - logb(vecj/3, 2);
 						}
 						if (vecj >= veci) { // forward dir
-							scores[1] += logb(vecj/3, 2) - logb(veci/3, 2);
+							scores[0] += logb(vecj/3, 2) - logb(veci/3, 2);
 						}
 						break;
 					}

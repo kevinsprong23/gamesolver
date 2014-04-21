@@ -11,7 +11,7 @@ import com.kevinsprong.gamesolver.*;
 // test suite to run game 2048 tests
 @RunWith(Suite.class)
 @SuiteClasses({BoardUpdateTest.class, WinConditionTest.class, 
-	LegalMoveTest.class, AlphaBetaThreesTest.class})
+	LegalMoveTest.class})
 public class GameThreesTestSuite {
 	@BeforeClass
 	public static void setUpClass() throws Exception {
