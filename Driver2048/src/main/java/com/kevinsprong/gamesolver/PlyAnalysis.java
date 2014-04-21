@@ -17,7 +17,7 @@ public class PlyAnalysis {
 		int numTrials = 30;
 
 		// sim parameters
-		int [] plyRange = {0, 6, 1};
+		int [] plyRange = {0, 7, 1};
 
 		ArrayList<Integer> plyVec = new ArrayList<Integer>();
 

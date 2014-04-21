@@ -17,28 +17,29 @@ public class ParamOptimizerThrees {
     	int numTrials = 30;
     	
     	// sim parameters
-    	double [] winRange = {0, 500, 1};
-    	double [] monoRange =  {0, 5, 1};
-    	double [] smoothRange =  {0, 5, 1};
-    	double [] openRange =  {0, 1, 1};
-    	ArrayList<Double> winVec = new ArrayList<Double>();
+    	double [] monoRange =  {0, 3, 1};
+    	double [] smoothRange =  {0, 3, 1};
+    	double [] checkerRange = {0, 3, 1};
+    	double [] openRange =  {0, 3, 1};
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();
+    	ArrayList<Double> checkerVec = new ArrayList<Double>();
     	ArrayList<Double> openVec = new ArrayList<Double>();
-    	for (double wR = winRange[0]; wR <= winRange[1]; wR += winRange[2]) {
-    		winVec.add(wR);
-    	}
+    	
     	for (double mR = monoRange[0]; mR <= monoRange[1]; mR += monoRange[2]) {
     		monoVec.add(mR);
     	}
     	for (double sR = smoothRange[0]; sR <= smoothRange[1]; sR += smoothRange[2]) {
     		smoothVec.add(sR);
     	}
+    	for (double cR = checkerRange[0]; cR <= checkerRange[1]; cR += checkerRange[2]) {
+    		checkerVec.add(cR);
+    	}
     	for (double oR = openRange[0]; oR <= openRange[1]; oR += openRange[2]) {
     		openVec.add(oR);
     	}
-    	int totalNumSettings = winVec.size() * monoVec.size() * 
-    			smoothVec.size() * openVec.size();
+    	int totalNumSettings = monoVec.size() * 
+    			smoothVec.size() * checkerVec.size() * openVec.size();
     	
     	// variables to hold game info
     	Threes game;
@@ -61,22 +62,23 @@ public class ParamOptimizerThrees {
     	FileWriter writer = new FileWriter(resultsFile);
     	// print header
     	String newline = System.getProperty("line.separator");
-    	writer.write("win,mono,smooth,open,avgWinPct,avgHighTile,highTile,avgScore" +
+    	writer.write("mono,smooth,checker,open,avgWinPct,avgHighTile,highTile,avgScore" +
     							newline);
 
         // loop to optimize parameters
     	long startTime = System.nanoTime();
     	int thisSetting = 0;
-    	for (double wR : winVec) {
-    		for (double mR : monoVec) {
-    			for (double sR : smoothVec) {
+    	for (double mR : monoVec) {
+    		for (double sR : smoothVec) {
+    			for (double cR : checkerVec) {
     				for (double oR : openVec) {
     					thisSetting++;
     					
     					// prevent all zeros among non-win parameters
-    					if (mR == 0 && sR == 0 && oR == 0) {
+    					if (mR == 0 && sR == 0 && cR == 0 && oR == 0) {
     						mR = 1;
     						sR = 1;
+    						cR = 1;
     						oR = 1;
     					}		
     					
@@ -87,9 +89,9 @@ public class ParamOptimizerThrees {
     					
     					for (int k = 0; k < numTrials; k++) {
     						
-    						System.out.println(Double.toString(wR) + ", " +
-        							Double.toString(mR) + ", " +
+    						System.out.println(Double.toString(mR) + ", " +
         							Double.toString(sR) + ", " +
+        							Double.toString(cR) + ", " +
         							Double.toString(oR) + ", " +
         							" Setting " + thisSetting + 
         							" of " + totalNumSettings + 
@@ -102,7 +104,7 @@ public class ParamOptimizerThrees {
     						game = new Threes("AlphaBeta", "DefaultComputer");
     						game.setSearchPly(7);
     						game.setWinCondition(65536);
-    						game.setHeuristicWeights(new double[]{wR, mR, sR, oR});
+    						game.setHeuristicWeights(new double[]{500, mR, sR, cR, oR});
     						game.initializeBoard();
 
     						// play the game until there is a winner
@@ -124,7 +126,7 @@ public class ParamOptimizerThrees {
     						}
     						scores[k] = (int) score;
     						highTiles[k] = highTile;
-    						if (highTile >= 2048) {
+    						if (highTile >= 6144) {
     							winRecord[k] = 1;
     						} else {
     							winRecord[k] = 0;
@@ -137,9 +139,9 @@ public class ParamOptimizerThrees {
     					avgScore = calculateAverage(scores);
     					
     					writer.write(
-    							Double.toString(wR) + "," +
     							Double.toString(mR) + "," +
     							Double.toString(sR) + "," +
+    							Double.toString(cR) + "," +
     							Double.toString(oR) + "," +
     							Double.toString(avgWinPct) + "," +
     							Double.toString(avgHighTile) + "," +

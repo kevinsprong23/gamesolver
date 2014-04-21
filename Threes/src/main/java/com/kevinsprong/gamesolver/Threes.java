@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 1, 7, 6};
+	private double[] heuristicWeights = {500, 2, 3, 4, 1};
 	public Scanner input;
 	
 	// getter and setter
@@ -543,8 +543,8 @@ public class Threes extends TwoPlayerGame {
     	int[][] board = gameStateIn.getBoardState();
     	
     	// heuristics to assess board.  SCORE IS RELATIVE TO HUMAN PLAYER
-    	double[] heuristicVals = {0, 0, 0, 0};
     	double[] heuristicWeights = this.getHeuristicWeights();
+    	double[] heuristicVals = {0, 0, 0, 0, 0};
     	double finalScore = 0;
     	
     	//---------------------------------------------------------------------
@@ -643,23 +643,106 @@ public class Threes extends TwoPlayerGame {
 
 
     	//---------------------------------------------------------------------
-    	// Heuristic 4:  penalize ones and twos
-
-    	double totalDistance = 0;
-    	ArrayList<int[]> theOnes = this.findOnesOnBoard(this.getGameState());
-    	ArrayList<int[]> theTwos = this.findTwosOnBoard(this.getGameState());
-    	for (int[] idx1 : theOnes) {
-    		for (int[] idx2 : theTwos) {
-    			totalDistance += (Math.abs(idx1[0] - idx2[0]) + 
-    					Math.abs(idx1[1] - idx2[1]));
-    		}
-    	}
-    	heuristicVals[3] = -1 * totalDistance;
+    	// Heuristic 4:  penalize checker-boarding of ones and twos
+    	ArrayList<int[]> theOnes = findOnesOnBoard(this.getGameState());
+    	ArrayList<int[]> theTwos = findTwosOnBoard(this.getGameState());
     	
+    	double totalStagger = 0;
+    	
+    	// check the ones
+    	double thisStagger = 0;
+    	for (int[] idx1 : theOnes) {
+    		thisStagger = 0;
+    		if (idx1[0]-1 >= 0) { // check up
+    			if (board[idx1[0]-1][idx1[1]] == 2) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx1[0]-1][idx1[1]] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+    		if (idx1[0]+1 < board.length) { // check down
+    			if (board[idx1[0]+1][idx1[1]] == 2) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx1[0]+1][idx1[1]] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+    		if (idx1[1]-1 >= 0) { // check left
+    			if (board[idx1[0]][idx1[1]-1] == 2) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx1[0]][idx1[1]-1] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+    		if (idx1[1]+1 < board.length) { // check right
+    			if (board[idx1[0]][idx1[1]+1] == 2) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx1[0]][idx1[1]+1] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+    		totalStagger += thisStagger;	
+    	}
+    	
+    	// now the twos 
+    	for (int[] idx2 : theTwos) {
+        	thisStagger = 0;
+    		if (idx2[0]-1 >= 0) { // check up
+    			if (board[idx2[0]-1][idx2[1]] == 1) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx2[0]-1][idx2[1]] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+    		if (idx2[0]+1 < board[0].length) { // check down
+    			if (board[idx2[0]+1][idx2[1]] == 1) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx2[0]+1][idx2[1]] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+    		if (idx2[1]-1 >= 0) { // check left
+    			if (board[idx2[0]][idx2[1]-1] == 1) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx2[0]][idx2[1]-1] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+    		if (idx2[1]+1 < board[0].length) { // check right
+    			if (board[idx2[0]][idx2[1]+1] == 1) {
+    				thisStagger = 0;
+    				break;
+    			} else if (board[idx2[0]][idx2[1]+1] > 0) {
+    				thisStagger += 1;
+    			}
+    		}
+        	totalStagger += thisStagger;	
+    	}
+
+    	heuristicVals[3] = -1* totalStagger;
     	
     	//---------------------------------------------------------------------
-    	// aggregate and return
+    	// Heuristic 5:  incentivize open tiles
+    	double openTiles = 0;
     	for (int i = 0; i < 4; i++) {
+    		for (int j = 0; j < 4; j++) {
+    			if (board[i][j] == 0) {
+    				openTiles += 1;
+    			}
+    		}
+    	}
+    	
+    	heuristicVals[4] = openTiles;
+    	//---------------------------------------------------------------------
+    	// aggregate and return
+    	for (int i = 0; i < heuristicVals.length; i++) {
     		finalScore += heuristicVals[i] * heuristicWeights[i];
     	}
     	return finalScore;

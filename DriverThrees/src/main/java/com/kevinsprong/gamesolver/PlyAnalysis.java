@@ -79,7 +79,7 @@ public class PlyAnalysis {
 				game = new Threes("AlphaBeta", "DefaultComputer");
 				game.setSearchPly(7);
 				game.setWinCondition(6144);
-				game.setHeuristicWeights(new double[]{500, 2, 3, 0});
+				game.setHeuristicWeights(new double[]{500, 2, 3, 0, 0});
 				game.initializeBoard();
 
 				// play the game until there is a winner
