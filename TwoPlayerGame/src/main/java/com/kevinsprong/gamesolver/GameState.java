@@ -114,6 +114,9 @@ public class GameState {
   		return this.moveStack;
   	}
   	public void setMoveStack(int[] moveStackIn) {
-  		this.moveStack = moveStackIn;
+  		this.moveStack = new int[moveStackIn.length];
+  		for (int i = 0; i < moveStackIn.length; i++) {
+  			this.moveStack[i] = moveStackIn[i];
+  		}
   	}
 }

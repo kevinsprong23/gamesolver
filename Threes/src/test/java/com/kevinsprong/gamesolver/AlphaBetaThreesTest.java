@@ -9,7 +9,7 @@ import com.kevinsprong.gamesolver.AlphaBetaSolver;
 
 public class AlphaBetaThreesTest {
 
-	TwoPlayerGame game;
+	Threes game;
 	
 	// instantiate a game
 	@Before
@@ -18,12 +18,13 @@ public class AlphaBetaThreesTest {
 	}
 
 	// a forced win exists in search space
-	/*
+	
 	@Test
 	public void TestPlayer1Move1() {
 		int[][] testBoard = {{3072,1536,768,384},{48,96,192,192},{2,3,6,12},{3,24,12,2}};
 		game.getGameState().setBoardState(testBoard);
 		game.getGameState().setPlayerToMove(1);
+		game.getGameState().setMoveStack(game.generateNewMoveStack());
 
 		String bestMove = AlphaBetaSolver.solveBoard(game);
 
@@ -36,12 +37,13 @@ public class AlphaBetaThreesTest {
 		int[][] testBoard = {{3072,1536,768,384},{24,48,96,192},{24,3,6,12},{3,24,12,2}};
 		game.getGameState().setBoardState(testBoard);
 		game.getGameState().setPlayerToMove(1);
+		game.getGameState().setMoveStack(game.generateNewMoveStack());
 
 		String bestMove = AlphaBetaSolver.solveBoard(game);
 
 		// check against truth
 		assertEquals("U", bestMove);
 	}
-	*/
+	
 
 }

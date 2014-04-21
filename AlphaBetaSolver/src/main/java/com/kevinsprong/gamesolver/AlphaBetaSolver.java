@@ -28,7 +28,7 @@ public class AlphaBetaSolver {
 		MoveNode originNode = null;
 		double moveEval = 0;
 		
-		while (timeElapsed < searchTime && thisPly <= searchPly) {
+		while (timeElapsed < searchTime && thisPly < searchPly) {
 			// solve it
 			thisPly += 1;
 			originNode = new MoveNode(currentGameState, thisPly);

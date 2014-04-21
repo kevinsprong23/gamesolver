@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {5000, 2, 3, 0};
+	private double[] heuristicWeights = {500, 1, 8, 6};
 	public Scanner input;
 	
 	// getter and setter
@@ -516,20 +516,20 @@ public class Threes extends TwoPlayerGame {
     }
     // with gs argument for alpha beta calls
     public int determineWinner(GameState currentState) {
-    	// check loser first
+    	// find max tile on board
+    	int maxTile = getMaxTile(currentState);
+
+    	if (maxTile >= this.getWinCondition()) {
+    		return 1;
+    	}
+    	
+    	// check loser 
     	if (currentState.getPlayerToMove() == 1 && 
     			this.findLegalMoves(currentState).length == 0) {
     		// can do this first since getting to p1's win condition 
     		// requires a successful move which leaves at least one empty space 
     		// (conditions don't overlap)
     		return 2;
-    	}
-
-    	// find max tile on board
-    	int maxTile = getMaxTile(currentState);
-
-    	if (maxTile >= this.getWinCondition()) {
-    		return 1;
     	}
 
     	// if neither then p1 is still alive
@@ -643,17 +643,46 @@ public class Threes extends TwoPlayerGame {
 
 
     	//---------------------------------------------------------------------
-    	// Heuristic 4:  open tiles
+    	// Heuristic 4:  pairwise blockages of ones and twos
 
-    	double openTiles = 0;
+    	double uninterruptedPairs = 0;
+    	// probe rightward
     	for (int i = 0; i < 4; i++) {
-    		for (int j = 0; j < 4; j++) {
-    			if (board[i][j] == 0) {
-    				openTiles += 1;
+    		for (int j = 0; j < 3; j++) {
+    			if (board[i][j] == 1 || board[i][j] == 2) {
+    				for (int k = j+1; k < 4; k++) {
+    				    // if there is a 3-sum, incentivize it
+    					if (board[i][j] + board[i][k] == 3) {
+    						uninterruptedPairs += 1;
+    						break;
+    					}
+    					// if there is a blocking tile, just break
+    					if (board[i][k] >= 0) {
+    						break;
+    					}
+    				}
     			}
     		}
     	}
-    	heuristicVals[3] = Math.pow(openTiles, 2);
+    	// probe downward
+    	for (int j = 0; j < 4; j++) {
+    		for (int i = 0; i < 3; i++) {
+    			if (board[i][j] == 1 || board[i][j] == 2) {
+    				for (int k = i+1; k < 4; k++) {
+    				    // if there is a 3-sum, incentivize it
+    					if (board[i][j] + board[k][j] == 3) {
+    						uninterruptedPairs += 1;
+    						break;
+    					}
+    					// if there is a blocking tile, just break
+    					if (board[k][j] >= 0) {
+    						break;
+    					}
+    				}
+    			}
+    		}
+    	}
+    	heuristicVals[3] = uninterruptedPairs;
     	
     	
     	//---------------------------------------------------------------------
@@ -731,10 +760,10 @@ public class Threes extends TwoPlayerGame {
     	int maxTile = this.getMaxTile(this.getGameState());
     	if (maxTile >= 48) {
     		// return all multiples of 6 that are between 6 and maxTile/8
-    		int maxTileMult = maxTile / 8 / 6;
+    		int maxTileMult = (int) logb(maxTile / 8 / 3, 2);
     		bonusTiles = new int[maxTileMult];
-    		for (int i = 1; i < maxTileMult; i++) {
-    			bonusTiles[i-1] = 3 * (int) Math.pow(2, i);
+    		for (int i = 1; i <= maxTileMult; i++) {
+    			bonusTiles[i-1] = (int) Math.pow(6, i);
     		}
     		
     	}
