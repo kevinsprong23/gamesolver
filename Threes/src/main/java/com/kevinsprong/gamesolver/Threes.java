@@ -645,16 +645,16 @@ public class Threes extends TwoPlayerGame {
     	//---------------------------------------------------------------------
     	// Heuristic 4:  penalize ones and twos
 
-    	double smallNums = 0;
-    	// probe rightward
-    	for (int i = 0; i < 4; i++) {
-    		for (int j = 0; j < 4; j++) {
-    			if (board[i][j] == 1 || board[i][j] == 2) {
-    				smallNums += 1;
-    			}
+    	double totalDistance = 0;
+    	ArrayList<int[]> theOnes = this.findOnesOnBoard(this.getGameState());
+    	ArrayList<int[]> theTwos = this.findTwosOnBoard(this.getGameState());
+    	for (int[] idx1 : theOnes) {
+    		for (int[] idx2 : theTwos) {
+    			totalDistance += (Math.abs(idx1[0] - idx2[0]) + 
+    					Math.abs(idx1[1] - idx2[1]));
     		}
     	}
-    	heuristicVals[3] = -1 * smallNums;
+    	heuristicVals[3] = -1 * totalDistance;
     	
     	
     	//---------------------------------------------------------------------
@@ -663,6 +663,31 @@ public class Threes extends TwoPlayerGame {
     		finalScore += heuristicVals[i] * heuristicWeights[i];
     	}
     	return finalScore;
+    }
+    
+    private ArrayList<int[]> findOnesOnBoard(GameState gsIn) {
+    	ArrayList<int[]> theOnes = new ArrayList<int[]>();
+    	int[][] board = gsIn.getBoardState();
+    	for (int i = 0; i < board.length; i++) {
+    		for (int j = 0; j < board[0].length; j++) {
+    			if (board[i][j] == 1) {
+    				theOnes.add(new int[]{i,j});
+    			}
+    		}
+    	}
+    	return theOnes;
+    }
+    private ArrayList<int[]> findTwosOnBoard(GameState gsIn) {
+    	ArrayList<int[]> theTwos = new ArrayList<int[]>();
+    	int[][] board = gsIn.getBoardState();
+    	for (int i = 0; i < board.length; i++) {
+    		for (int j = 0; j < board[0].length; j++) {
+    			if (board[i][j] == 2) {
+    				theTwos.add(new int[]{i,j});
+    			}
+    		}
+    	}
+    	return theTwos;
     }
     
     // check monotonicity of a vector in log space ignoring zeros
