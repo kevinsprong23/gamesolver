@@ -147,6 +147,7 @@ public class Threes extends TwoPlayerGame {
     	String p2Strat = this.getP2MoveStrat();
     	
     	if (currentState.getPlayerToMove() == 1) { // dont toggle flag until we actually update the board in other func
+    		
     		if (p1Strat.equals("AlphaBeta")) { // use AlphaBetaSolver
     			currentState.setP1PreviousMove(AlphaBetaSolver.solveBoard(this));
     		} else if (p1Strat.equals("Random")) {
@@ -540,6 +541,141 @@ public class Threes extends TwoPlayerGame {
     }
     
     // compute board evaluation
+    
+    // try threesus logic
+    public double evaluateGameState0(GameState gameStateIn) {
+    	int[][] board = gameStateIn.getBoardState();
+    	int highTile = this.getMaxTile(gameStateIn);
+    	double finalScore = 0;
+    	for (int i = 0; i < 4; i++) {
+    		for (int j = 0; j < 4; j++) {
+    			// n points for a zero
+    			if (board[i][j] == 0) {
+    				finalScore += 3;
+    			} else {
+    				// for each adjacent card we can merge with.
+    				if (i-1 > 0) {
+    					if (this.mergeable(board[i][j], board[i-1][j])) {
+    						finalScore += 2;
+    					}
+       				}
+    				if (i+1 < 4) {
+    					if (this.mergeable(board[i][j], board[i+1][j])) {
+    						finalScore += 2;
+    					}
+       				}
+    				if (j-1 > 0) {
+    					if (this.mergeable(board[i][j], board[i][j-1])) {
+    						finalScore += 2;
+    					}
+       				}
+    				if (j+1 < 4) {
+    					if (this.mergeable(board[i][j], board[i][j+1])) {
+    						finalScore += 2;
+    					}
+       				}
+    				
+    				// negative if we're trapped between higher-valued cards, either horizontally or vertically.
+    				if ((i == 0 || (board[i-1][j] >= 3 && board[i-1][j] > board[i][j])) 
+    						&& (i == 3 || (board[i+1][j] >= 3 && board[i+1][j] > board[i][j]))) {
+    					finalScore -= 5;
+    				}
+    				if ((j == 0 || (board[i][j-1] >= 3 && board[i][j-1] > board[i][j])) 
+    						&& (j == 3 || (board[i][j+1] >= 3 && board[i][j+1] > board[i][j]))) {
+    					finalScore -= 5;
+    				}
+    				
+    				// point if next to at least one card twice our value.
+    				if (isNearTile(board, i, j, 2*board[i][j])){
+    					finalScore += 2;
+       				}
+    				
+    				// if we're big enough
+    				if (highTile > 3) {
+    					if (board[i][j] == highTile) {
+    						// for each wall we're touching if we're the biggest card
+    						if (i == 0 || i == 3) {
+    							finalScore += 3;
+    						}
+    						if (j == 0 || j == 3) {
+    							finalScore += 3;
+    						}
+    					}
+    				}
+    				
+    				
+    				// incentivize 2-chains
+    				if ((int) logb(highTile/3,2) - (int) logb(board[i][j]/3,2) == 1) {
+    					// if next to a highTile 
+    					if (isNearTile(board, i, j, highTile)) {
+    						finalScore += 1;
+    					}
+    					// for each wall we're touching
+						if (i == 0 || i == 3) {
+							finalScore += 1;
+						}
+						if (j == 0 || j == 3) {
+							finalScore += 1;
+						}
+    				}
+    				// incentivize three chains
+    				if ((int) logb(highTile/3,2) - (int) logb(board[i][j]/3,2) == 2) {
+    					// check up if next to a highTile-1
+    					if ((i-1 > 0) && board[i][j] >= 3  && board[i-1][j] == 2*board[i][j]) {
+    						// which is also next to a high tile
+    						if(isNearTile(board, i-1, j, 4*board[i][j])) {
+    							finalScore +=1;
+    						}
+    					}
+    					// check down if next to a highTile-1
+    					// unsure if these really should be else ifs
+    					else if ((i+1 < 4) && board[i][j] >= 3  && board[i+1][j] == 2*board[i][j]) {
+							// which is also next to a high tile
+    						if(isNearTile(board, i+1, j, 4*board[i][j])) {
+    							finalScore +=1;
+    						}
+						}
+    					// check left if next to a highTile-1
+    					else if ((j-1 > 0) && board[i][j] >= 3  && board[i][j-1] == 2*board[i][j]) {
+							// which is also next to a high tile
+    						if(isNearTile(board, i, j-1, 4*board[i][j])) {
+    							finalScore +=1;
+    						}
+						}
+    					// check right if next to a highTile-1
+    					else if ((j+1 < 4) && board[i][j] >= 3  && board[i][j+1] == 2*board[i][j]) {
+							// which is also next to a high tile
+    						if(isNearTile(board, i, j+1, 4*board[i][j])) {
+    							finalScore +=1;
+    						}
+						}
+    					
+    				}
+    			}
+    		}
+    	}
+    	return finalScore;
+    }
+    
+    // check proximity to tile
+    private boolean isNearTile(int[][] board, int i, int j, int tileVal) {
+    	if (((i-1 > 0) && board[i][j] >= 3  && board[i-1][j] == tileVal) || 
+				((i+1 < 4) && board[i][j] >= 3  && board[i+1][j] == tileVal) ||
+				((j-1 > 0) && board[i][j] >= 3  && board[i][j-1] == tileVal) ||
+				((j+1 < 4) && board[i][j] >= 3  && board[i][j+1] == tileVal)) {
+			return true;
+		} else {
+			return false;
+		}
+    }
+    
+    // dumb one; just maximize score
+    public double evaluateGameState1(GameState gameStateIn) {
+    	this.updateGameScore(gameStateIn, 0);
+    	return gameStateIn.getGameScore();
+    }
+    
+    // my version; uses similar logic to 2048
     public double evaluateGameState(GameState gameStateIn) {
     	// update all of this with threes stuff
     	
@@ -596,12 +732,12 @@ public class Threes extends TwoPlayerGame {
 	    				// check smoothness versus first non-zero tile
 	    				if (board[i][k] != 0) {
 	    					if (board[i][j] + board[i][k] == 3) {
-	    						totalDeviation += 0;
+	    						totalDeviation -= 0;
 	    					} else if ((board[i][j] == 1 &&  board[i][k] == 1) || 
 	    							(board[i][j] == 2 &&  board[i][k] == 2)) {
 	    						totalDeviation += 2; 
 	    					} else if (board[i][j] == board[i][k]) {
-	    						totalDeviation -= 1;
+	    						totalDeviation -= 0;
 	    					} else if ((board[i][j] + board[i][k]) % 3 > 0) {
 	    						// treat the merge as a 3 with the multiple above
 	    						// other num
@@ -626,17 +762,17 @@ public class Threes extends TwoPlayerGame {
     					// check smoothness versus first non-zero tile
     					if (board[k][j] != 0) {
     						if (board[i][j] + board[k][j] == 3) {
-	    						totalDeviation += 0;
+	    						totalDeviation -= 0;
 	    					} else if ((board[i][j] == 1 &&  board[k][j] == 1) || 
 	    							(board[i][j] == 2 &&  board[k][j] == 2)) {
-	    						totalDeviation += 1; // generous; assumes they only need one merge to merge with each other
+	    						totalDeviation += 2; 
 	    					} else if (board[i][j] == board[k][j]) {
-	    						totalDeviation -= 1;
+	    						totalDeviation -= 0;
 	    					} else if ((board[i][j] + board[k][j]) % 3 > 0) {
 	    						// treat the merge as a 3 with the multiple above
 	    						// other num
 	    						totalDeviation += logb(Math.max(board[k][j], 
-	    								board[i][j])/3, 2) - 1;
+	    								board[i][j])/3, 2) + 1;
 	    					} else {
 	    						totalDeviation += Math.abs(logb(board[i][j]/3, 2)- 
 	    								logb(board[k][j]/3, 2));	
@@ -736,7 +872,7 @@ public class Threes extends TwoPlayerGame {
     	heuristicVals[3] = -1 * totalStagger;
     	
     	//---------------------------------------------------------------------
-    	// Heuristic 5:  incentivize open tiles
+    	// Heuristic 5:  encourage open tiles
     	double openTiles = 0;
     	for (int i = 0; i < 4; i++) {
     		for (int j = 0; j < 4; j++) {
@@ -753,6 +889,11 @@ public class Threes extends TwoPlayerGame {
     		finalScore += heuristicVals[i] * heuristicWeights[i];
     	}
     	return finalScore;
+    }
+    
+    // tests mergeability of two cells
+    private boolean mergeable(int a, int b) {
+    	return ((a > 0 && a + b == 3) || (a > 2 && a == b));
     }
     
     private ArrayList<int[]> findOnesOnBoard(GameState gsIn) {
