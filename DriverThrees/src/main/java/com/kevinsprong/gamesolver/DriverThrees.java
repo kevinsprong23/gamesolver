@@ -13,7 +13,7 @@ public class DriverThrees {
     	game.input = new Scanner(System.in);
     	game.setSearchTime(300);
     	game.initializeBoard();
-    	game.setHeuristicWeights(new double[]{500, 1, 3, 0, 2});
+    	game.setHeuristicWeights(new double[]{500, 2, 3, 0, 3});
     	
     	// debug printing
 		GameState gs = game.getGameState();

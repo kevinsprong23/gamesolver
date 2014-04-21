@@ -599,12 +599,14 @@ public class Threes extends TwoPlayerGame {
 	    						totalDeviation += 0;
 	    					} else if ((board[i][j] == 1 &&  board[i][k] == 1) || 
 	    							(board[i][j] == 2 &&  board[i][k] == 2)) {
-	    						totalDeviation += 1; // generous; assumes they only need one merge to merge with each other
+	    						totalDeviation += 2; 
+	    					} else if (board[i][j] == board[i][k]) {
+	    						totalDeviation -= 1;
 	    					} else if ((board[i][j] + board[i][k]) % 3 > 0) {
 	    						// treat the merge as a 3 with the multiple above
 	    						// other num
 	    						totalDeviation += logb(Math.max(board[i][k], 
-	    								board[i][j])/3, 2) - 1;
+	    								board[i][j])/3, 2) + 1;
 	    					} else {
 	    						totalDeviation += Math.abs(logb(board[i][j]/3, 2)- 
 	    								logb(board[i][k]/3, 2));	
@@ -628,6 +630,8 @@ public class Threes extends TwoPlayerGame {
 	    					} else if ((board[i][j] == 1 &&  board[k][j] == 1) || 
 	    							(board[i][j] == 2 &&  board[k][j] == 2)) {
 	    						totalDeviation += 1; // generous; assumes they only need one merge to merge with each other
+	    					} else if (board[i][j] == board[k][j]) {
+	    						totalDeviation -= 1;
 	    					} else if ((board[i][j] + board[k][j]) % 3 > 0) {
 	    						// treat the merge as a 3 with the multiple above
 	    						// other num
