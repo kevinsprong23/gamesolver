@@ -86,7 +86,7 @@ public class TimeAnalysis {
 				}
 				game.setSearchTime(tR);
 				game.setWinCondition(65536);
-				game.setHeuristicWeights(new double[]{500, 2, 3, 0});
+				game.setHeuristicWeights(new double[]{500, 2, 3});
 				game.initializeBoard();
 
 				// play the game until there is a winner

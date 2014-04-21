@@ -10,7 +10,7 @@ import java.util.Scanner;
  */
 public class TwoZeroFourEight extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 2, 3, 0};
+	private double[] heuristicWeights = {500, 2, 3};
 	public Scanner input;
 	
 	// getter and setter
@@ -464,7 +464,7 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     	int[][] board = gameStateIn.getBoardState();
     	
     	// heuristics to assess board.  SCORE IS RELATIVE TO HUMAN PLAYER
-    	double[] heuristicVals = {0, 0, 0, 0};
+    	double[] heuristicVals = {0, 0, 0};
     	double[] heuristicWeights = this.getHeuristicWeights();
     	double finalScore = 0;
     	
@@ -538,25 +538,10 @@ public class TwoZeroFourEight extends TwoPlayerGame {
     		}
     	}   	
     	heuristicVals[2] = -1 * totalDeviation;
-
-
-    	//---------------------------------------------------------------------
-    	// Heuristic 4:  the number of open tiles
-
-    	double openTiles = 0;
-    	for (int i = 0; i < 4; i++) {
-    		for (int j = 0; j < 4; j++) {
-    			if (board[i][j] == 0) {
-    				openTiles += 1;
-    			}
-    		}
-    	}
-    	heuristicVals[3] = Math.pow(openTiles, 2);
-    	
     	
     	//---------------------------------------------------------------------
     	// aggregate and return
-    	for (int i = 0; i < 4; i++) {
+    	for (int i = 0; i < heuristicVals.length; i++) {
     		finalScore += heuristicVals[i] * heuristicWeights[i];
     	}
     	return finalScore;
