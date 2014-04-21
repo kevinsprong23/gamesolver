@@ -118,4 +118,19 @@ public class BoardUpdateTest {
 			assertArrayEquals(truthBoard[i], resultBoard[i]);
 		}
 	}
+	// shift with no collisions on open column, one collision on right
+	@Test
+	public void TestPlayer1Move8() {
+		int[][] testBoard = {{0,0,0,1},{0,0,6,2},{0,0,3,3},{2,1,3,6}};
+		game.getGameState().setBoardState(testBoard);
+		game.getGameState().setPlayerToMove(1);
+		GameState newState = game.calcUpdatedGameState(game.getGameState(), "U");
+		int[][] resultBoard = newState.getBoardState();
+
+		// check against truth
+		int[][] truthBoard = {{0,0,6,3},{0,0,3,3},{2,1,3,6},{0,0,0,0}};
+		for (int i = 0; i < 4; i++) {
+			assertArrayEquals(truthBoard[i], resultBoard[i]);
+		}
+	}
 }

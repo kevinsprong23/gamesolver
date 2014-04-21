@@ -202,29 +202,28 @@ public class Threes extends TwoPlayerGame {
     			for (int j = 0; j < 4; j++) {
     				// find and perform collision
     				for (int i = 1; i < 4; i++) {
-    					if ((i == 1 || currentBoard[i-2][j] != 0) 
-    							&& currentBoard[i][j] > 0) {
-    						// because board(i,j) > 0 this detects a 1 and 2
-    						if (currentBoard[i][j] + currentBoard[i-1][j] == 3) {
-    							currentBoard[i-1][j] = 3;
-    							currentBoard[i][j] = 0;
-    							break;
-    						} else if (currentBoard[i][j] > 2 && 
-    								currentBoard[i][j] == currentBoard[i-1][j]) {
-    							currentBoard[i-1][j] = 2*currentBoard[i-1][j];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
-    						
-    					}
-    				}
-    				// move everything up if there is a zero above
-    				for (int i = 1; i < 4; i++) {
-    					if (currentBoard[i-1][j] == 0) {
+    					// case 1:  zero above, number here
+    					if (currentBoard[i-1][j] == 0 && currentBoard[i][j] > 0) {
     						currentBoard[i-1][j] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
     						idxShift[j] = 1;
     					}
+    					// case 2:  one/two above, complement here
+    					else if ((currentBoard[i-1][j] == 1 || currentBoard[i-1][j] == 2) && 
+    							currentBoard[i-1][j] + currentBoard[i][j] == 3) {
+    						currentBoard[i-1][j] = 3;
+    						currentBoard[i][j] = 0;
+    						idxShift[j] = 1;
+    					}
+    					// case 3:  same number above
+    					else if (currentBoard[i][j] > 2 && 
+    							currentBoard[i-1][j] == currentBoard[i][j]) {
+    						currentBoard[i-1][j] = 2 * currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    						idxShift[j] = 1;
+    					}
+    					// case 4:  number above, number here
+    					// because we start from the top, do nothing - log jam
     				}
     			}
     		} else if (move.equals("D")) {
@@ -233,29 +232,28 @@ public class Threes extends TwoPlayerGame {
     			for (int j = 0; j < 4; j++) {
     				// find and perform collision
     				for (int i = 2; i >= 0; i--) {
-    					if ((i == 2 || currentBoard[i+2][j] != 0) 
-    							&& currentBoard[i][j] > 0) {
-    						// because board(i,j) > 0 this detects a 1 and 2
-    						if (currentBoard[i][j] + currentBoard[i+1][j] == 3) {
-    							currentBoard[i+1][j] = 3;
-    							currentBoard[i][j] = 0;
-    							break;
-    						} else if (currentBoard[i][j] > 2 && 
-    								currentBoard[i][j] == currentBoard[i+1][j]) {
-    							currentBoard[i+1][j] = 2*currentBoard[i+1][j];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
-    						
-    					}
-    				}
-    				// move everything down if there is a zero below
-    				for (int i = 2; i >= 0; i--) {
-    					if (currentBoard[i+1][j] == 0) {
+    					// case 1:  zero below, number here
+    					if (currentBoard[i+1][j] == 0 && currentBoard[i][j] > 0) {
     						currentBoard[i+1][j] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
     						idxShift[j] = 1;
     					}
+    					// case 2:  one/two below, complement here
+    					else if ((currentBoard[i+1][j] == 1 || currentBoard[i+1][j] == 2) && 
+    							currentBoard[i+1][j] + currentBoard[i][j] == 3) {
+    						currentBoard[i+1][j] = 3;
+    						currentBoard[i][j] = 0;
+    						idxShift[j] = 1;
+    					}
+    					// case 3:  same number below
+    					else if (currentBoard[i][j] > 2 && 
+    							currentBoard[i+1][j] == currentBoard[i][j]) {
+    						currentBoard[i+1][j] = 2 * currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    						idxShift[j] = 1;
+    					}
+    					// case 4:  number below, number here
+    					// because we start from the top, do nothing - log jam
     				}
     			}
     		} else if (move.equals("L")) {
@@ -264,29 +262,28 @@ public class Threes extends TwoPlayerGame {
     			for (int i = 0; i < 4; i++) {
     				// find and perform collision
     				for (int j = 1; j < 4; j++) {
-    					if ((j == 1 || currentBoard[i][j-2] != 0) 
-    							&& currentBoard[i][j] > 0) {
-    						// because board(i,j) > 0 this detects a 1 and 2
-    						if (currentBoard[i][j] + currentBoard[i][j-1] == 3) {
-    							currentBoard[i][j-1] = 3;
-    							currentBoard[i][j] = 0;
-    							break;
-    						} else if (currentBoard[i][j] > 2 && 
-    								currentBoard[i][j] == currentBoard[i][j-1]) {
-    							currentBoard[i][j-1] = 2*currentBoard[i][j-1];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
-    						
-    					}
-    				}
-    				// move everything left if there is a zero adjacent
-    				for (int j = 1; j < 4; j++) {
-    					if (currentBoard[i][j-1] == 0) {
+    					// case 1:  zero left, number here
+    					if (currentBoard[i][j-1] == 0 && currentBoard[i][j] > 0) {
     						currentBoard[i][j-1] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
     						idxShift[i] = 1;
     					}
+    					// case 2:  one/two to left, complement here
+    					else if ((currentBoard[i][j-1] == 1 || currentBoard[i][j-1] == 2) && 
+    							currentBoard[i][j-1] + currentBoard[i][j] == 3) {
+    						currentBoard[i][j-1] = 3;
+    						currentBoard[i][j] = 0;
+    						idxShift[i] = 1;
+    					}
+    					// case 3:  same number
+    					else if (currentBoard[i][j] > 2 && 
+    							currentBoard[i][j-1] == currentBoard[i][j]) {
+    						currentBoard[i][j-1] = 2 * currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    						idxShift[i] = 1;
+    					}
+    					// case 4:  number above, number here
+    					// because we start from the top, do nothing - log jam
     				}
     			}
     		} else if (move.equals("R")) {
@@ -295,29 +292,28 @@ public class Threes extends TwoPlayerGame {
     			for (int i = 0; i < 4; i++) {
     				// find and perform collision
     				for (int j = 2; j >= 0; j--) {
-    					if ((j == 2 || currentBoard[i][j+2] != 0) 
-    							&& currentBoard[i][j] > 0) {
-    						// because board(i,j) > 0 this detects a 1 and 2
-    						if (currentBoard[i][j] + currentBoard[i][j+1] == 3) {
-    							currentBoard[i][j+1] = 3;
-    							currentBoard[i][j] = 0;
-    							break;
-    						} else if (currentBoard[i][j] > 2 && 
-    								currentBoard[i][j] == currentBoard[i][j+1]) {
-    							currentBoard[i][j+1] = 2*currentBoard[i][j+1];
-    							currentBoard[i][j] = 0;
-    							break;
-    						}
-    						
-    					}
-    				}
-    				// move everything right if there is a zero adjacent
-    				for (int j = 2; j >= 0; j--) {
-    					if (currentBoard[i][j+1] == 0) {
+    					// case 1:  zero left, number here
+    					if (currentBoard[i][j+1] == 0 && currentBoard[i][j] > 0) {
     						currentBoard[i][j+1] = currentBoard[i][j];
     						currentBoard[i][j] = 0;
     						idxShift[i] = 1;
     					}
+    					// case 2:  one/two, complement here
+    					else if ((currentBoard[i][j+1] == 1 || currentBoard[i][j+1] == 2) && 
+    							currentBoard[i][j+1] + currentBoard[i][j] == 3) {
+    						currentBoard[i][j+1] = 3;
+    						currentBoard[i][j] = 0;
+    						idxShift[i] = 1;
+    					}
+    					// case 3:  same number 
+    					else if (currentBoard[i][j] > 2 && 
+    							currentBoard[i][j+1] == currentBoard[i][j]) {
+    						currentBoard[i][j+1] = 2 * currentBoard[i][j];
+    						currentBoard[i][j] = 0;
+    						idxShift[i] = 1;
+    					}
+    					// case 4:  number above, number here
+    					// because we start from the top, do nothing - log jam
     				}
     			}
     		}
@@ -607,8 +603,8 @@ public class Threes extends TwoPlayerGame {
 	    					} else if ((board[i][j] + board[i][k]) % 3 > 0) {
 	    						// treat the merge as a 3 with the multiple above
 	    						// other num
-	    						totalDeviation += logb(2*Math.max(board[i][k], 
-	    								board[i][j])/3, 2);
+	    						totalDeviation += logb(Math.max(board[i][k], 
+	    								board[i][j])/3, 2) - 1;
 	    					} else {
 	    						totalDeviation += Math.abs(logb(board[i][j]/3, 2)- 
 	    								logb(board[i][k]/3, 2));	
@@ -635,8 +631,8 @@ public class Threes extends TwoPlayerGame {
 	    					} else if ((board[i][j] + board[k][j]) % 3 > 0) {
 	    						// treat the merge as a 3 with the multiple above
 	    						// other num
-	    						totalDeviation += logb(2*Math.max(board[k][j], 
-	    								board[i][j])/3, 2);
+	    						totalDeviation += logb(Math.max(board[k][j], 
+	    								board[i][j])/3, 2) - 1;
 	    					} else {
 	    						totalDeviation += Math.abs(logb(board[i][j]/3, 2)- 
 	    								logb(board[k][j]/3, 2));	
