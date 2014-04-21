@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 0, 6, 0, 0};
+	private double[] heuristicWeights = {500, 1, 6, 1, 3};
 	public Scanner input;
 	
 	// getter and setter
@@ -670,13 +670,13 @@ public class Threes extends TwoPlayerGame {
     }
     
     // dumb one; just maximize score
-    public double evaluateGameState1(GameState gameStateIn) {
+    public double evaluateGameState(GameState gameStateIn) {
     	this.updateGameScore(gameStateIn, 0);
     	return gameStateIn.getGameScore();
     }
     
     // my version; uses similar logic to 2048
-    public double evaluateGameState(GameState gameStateIn) {
+    public double evaluateGameState1(GameState gameStateIn) {
     	// update all of this with threes stuff
     	
     	int[][] board = gameStateIn.getBoardState();
