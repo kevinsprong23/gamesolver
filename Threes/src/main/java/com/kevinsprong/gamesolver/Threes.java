@@ -442,24 +442,20 @@ public class Threes extends TwoPlayerGame {
     		// get the valid move tiles
     		ArrayList<int[]> zeroList = this.getValidComputerMoveTiles(currentState);
     		
-	    	// legal moves are the top of the moveStack or the bonusMoveList, to open tiles
+	    	// legal moves are the uniques of the moveStack or the bonusMoveList, to open tiles
 	    	// opposite P1's move
 	    	// parse moveStack
 	    	List<Integer> uniqueMoves = new ArrayList<Integer>();
-	    	int[] moveStack = this.getGameState().getMoveStack();
-	    	int topMove = 0;
+	    	int[] moveStack = currentState.getMoveStack();
 	    	for (int j = 0; j < moveStack.length; j++) {
 	    		if (moveStack[j] > 0) {
-	    			topMove = moveStack[j];
+	    			uniqueMoves.add(moveStack[j]);
 	    			break;
 	    		}
 	    	}
-	    	uniqueMoves.add(topMove);
-	    	
-	    	for (int bonus : this.findBonusMoves()) {
-	    		uniqueMoves.add(bonus);
-	    	}
-	    	
+	   
+	    	// ignore bonus moves for now to reduce branching factor, they are 
+	    	// low probability - including them hurt performance
 	    	Integer[] legalMoveTiles = uniqueMoves.toArray(
 	    			new Integer[uniqueMoves.size()]);
 	    	// build list of moves
@@ -786,10 +782,32 @@ public class Threes extends TwoPlayerGame {
 
 
     	//---------------------------------------------------------------------
-    	// Heuristic 4:  the game score
-    	this.updateGameScore(gameStateIn, 0);
-
-    	heuristicVals[3] = gameStateIn.getGameScore();
+    	// Heuristic 4:  surroundedness of ones and twos
+        double surroundedFactor = 0;
+    	for (int i = 0; i < 4; i++) {
+    		for (int j = 0; j < 4; j++) {
+    			if (board[i][j] == 1 || board[i][j] == 2) {
+    				// check up if next to a highTile-1
+					if ((i-1 > 0) && board[i][j] + board[i-1][j] != 3) {
+						surroundedFactor += 1;
+					}
+					// check down if next to a highTile-1
+					// unsure if these really should be else ifs
+					if ((i+1 < 4) && board[i][j] + board[i+1][j] != 3) {
+						surroundedFactor += 1;
+					}
+					// check left if next to a highTile-1
+					if ((j-1 > 0) && board[i][j] + board[i][j-1] != 3) {
+						surroundedFactor += 1;
+					}
+					// check right if next to a highTile-1
+					if ((j+1 < 4)  && board[i][j] + board[i][j+1] != 3) {
+						surroundedFactor += 1;
+					}
+    			}
+    		}
+    	}
+    	heuristicVals[3] = -1 * surroundedFactor;
     	
     	//---------------------------------------------------------------------
     	// Heuristic 5:  encourage open tiles
@@ -814,31 +832,6 @@ public class Threes extends TwoPlayerGame {
     // tests mergeability of two cells
     private boolean mergeable(int a, int b) {
     	return ((a > 0 && a + b == 3) || (a > 2 && a == b));
-    }
-    
-    private ArrayList<int[]> findOnesOnBoard(GameState gsIn) {
-    	ArrayList<int[]> theOnes = new ArrayList<int[]>();
-    	int[][] board = gsIn.getBoardState();
-    	for (int i = 0; i < board.length; i++) {
-    		for (int j = 0; j < board[0].length; j++) {
-    			if (board[i][j] == 1) {
-    				theOnes.add(new int[]{i,j});
-    			}
-    		}
-    	}
-    	return theOnes;
-    }
-    private ArrayList<int[]> findTwosOnBoard(GameState gsIn) {
-    	ArrayList<int[]> theTwos = new ArrayList<int[]>();
-    	int[][] board = gsIn.getBoardState();
-    	for (int i = 0; i < board.length; i++) {
-    		for (int j = 0; j < board[0].length; j++) {
-    			if (board[i][j] == 2) {
-    				theTwos.add(new int[]{i,j});
-    			}
-    		}
-    	}
-    	return theTwos;
     }
     
     // check monotonicity of a vector in log space ignoring zeros

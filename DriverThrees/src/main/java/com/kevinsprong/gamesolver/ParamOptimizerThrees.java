@@ -14,13 +14,13 @@ public class ParamOptimizerThrees {
     	String resultsFilePath = "ParameterSearchThreesInitial.csv";
     	
     	// num sims per parameter setting
-    	int numTrials = 10;
+    	int numTrials = 5;
     	
     	// sim parameters
-    	double [] monoRange =  {0, 2.01, 1};
-    	double [] smoothRange =  {0, 4.01, 1};
-    	double [] checkerRange = {0, 1.01, 1};
-    	double [] openRange =  {0, 2.01, 1};
+    	double [] monoRange =  {0, 4.01, 2};
+    	double [] smoothRange =  {0, 4.01, 2};
+    	double [] checkerRange = {0, 2.01, 1};
+    	double [] openRange =  {0, 3.01, 1.5};
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();
     	ArrayList<Double> checkerVec = new ArrayList<Double>();
@@ -102,8 +102,8 @@ public class ParamOptimizerThrees {
     						
     						// create a new game
     						game = new Threes("AlphaBeta", "DefaultComputer");
-    						game.setSearchTime(200);
-    						game.setWinCondition(65536);
+    						game.setSearchTime(100);
+    						game.setWinCondition(6144);
     						game.setHeuristicWeights(new double[]{500, mR, sR, cR, oR});
     						game.initializeBoard();
 
