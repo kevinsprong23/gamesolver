@@ -11,16 +11,16 @@ import java.util.ArrayList;
 public class ParamOptimizerThrees {
     public static void main( String[] args ) throws IOException {
     	// out file location
-    	String resultsFilePath = "ParameterSearchThreesInitial.csv";
+    	String resultsFilePath = "ParameterSearchThreesRefine.csv";
     	
     	// num sims per parameter setting
-    	int numTrials = 5;
+    	int numTrials = 30;
     	
     	// sim parameters
-    	double [] monoRange =  {0, 4.01, 2};
-    	double [] smoothRange =  {0, 4.01, 2};
-    	double [] checkerRange = {0, 2.01, 1};
-    	double [] openRange =  {0, 3.01, 1.5};
+    	double [] monoRange =  {3.5, 4.51, 0.5};
+    	double [] smoothRange =  {2, 4.01, 0.5};
+    	double [] checkerRange = {1, 2.01, 0.5};
+    	double [] openRange =  {1.5, 3.01, 1.5};
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();
     	ArrayList<Double> checkerVec = new ArrayList<Double>();
@@ -102,7 +102,7 @@ public class ParamOptimizerThrees {
     						
     						// create a new game
     						game = new Threes("AlphaBeta", "DefaultComputer");
-    						game.setSearchTime(100);
+    						game.setSearchPly(7);
     						game.setWinCondition(6144);
     						game.setHeuristicWeights(new double[]{500, mR, sR, cR, oR});
     						game.initializeBoard();

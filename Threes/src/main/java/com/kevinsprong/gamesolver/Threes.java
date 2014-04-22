@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 1, 6, 1, 3};
+	private double[] heuristicWeights = {500, 2, 4, 1, 3};
 	public Scanner input;
 	
 	// getter and setter
@@ -30,7 +30,7 @@ public class Threes extends TwoPlayerGame {
     	this.setP1MoveStrat("AlphaBeta");
     	this.setP2MoveStrat("DefaultComputer");
     	// solver parameters
-    	this.setSearchPly(6);  
+    	this.setSearchPly(7);  
         this.setWinCondition(6144);
         
         // initialize game state
@@ -46,7 +46,7 @@ public class Threes extends TwoPlayerGame {
     	this.setP1MoveStrat(p1Strat);
     	this.setP2MoveStrat(p2Strat);
     	// solver parameters
-        this.setSearchPly(6);  
+        this.setSearchPly(7);  
         this.setWinCondition(6144);
         
         // initialize game state
