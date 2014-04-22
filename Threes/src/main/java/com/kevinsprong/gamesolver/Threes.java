@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 3.5, 4, 1, 4};
+	private double[] heuristicWeights = {500, 2, 4, 0, 2};
 	public Scanner input;
 	
 	// getter and setter
@@ -786,21 +786,39 @@ public class Threes extends TwoPlayerGame {
     		for (int j = 0; j < 4; j++) {
     			if (board[i][j] == 1 || board[i][j] == 2) {
     				// check up if next to a highTile-1
-					if ((i-1 > 0) && board[i][j] + board[i-1][j] != 3) {
-						surroundedFactor += 1;
+					if (i-1 > 0) {
+						if (board[i][j] + board[i-1][j] != 3) {
+							surroundedFactor += 1;
+						} else {
+							surroundedFactor -= 1;
+						}
 					}
 					// check down if next to a highTile-1
 					// unsure if these really should be else ifs
-					if ((i+1 < 4) && board[i][j] + board[i+1][j] != 3) {
-						surroundedFactor += 1;
+					if (i+1 < 4) {
+						if (board[i][j] + board[i+1][j] != 3) {
+							surroundedFactor += 1;
+						} else {
+							surroundedFactor -= 1;
+						}
+						
 					}
 					// check left if next to a highTile-1
-					if ((j-1 > 0) && board[i][j] + board[i][j-1] != 3) {
-						surroundedFactor += 1;
+					if (j-1 > 0) {
+						if (board[i][j] + board[i][j-1] != 3) {
+							surroundedFactor += 1;
+						} else {
+							surroundedFactor -= 1;
+						}
+						
 					}
 					// check right if next to a highTile-1
-					if ((j+1 < 4)  && board[i][j] + board[i][j+1] != 3) {
-						surroundedFactor += 1;
+					if (j+1 < 4) {
+						if (board[i][j] + board[i][j+1] != 3) {
+							surroundedFactor += 1;
+						} else {
+							surroundedFactor -= 1;
+						}
 					}
     			}
     		}

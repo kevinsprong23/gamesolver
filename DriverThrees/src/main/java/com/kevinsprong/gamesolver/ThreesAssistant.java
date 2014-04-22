@@ -14,7 +14,7 @@ public class ThreesAssistant {
     	Threes game = new Threes("AlphaBeta", "UserInput");
     	game.input = new Scanner(System.in);
     	game.setSearchPly(10);
-    	game.setHeuristicWeights(new double[]{500, 3.5, 4, 1, 4});
+    	game.setHeuristicWeights(new double[]{500, 2, 4, 0, 2});
     	
     	// manual init board
     	System.out.println("Enter the initial board as comma separated integers: ");

@@ -11,9 +11,9 @@ public class DriverThrees {
         // make a new game
     	Threes game = new Threes("AlphaBeta", "DefaultComputer");
     	game.input = new Scanner(System.in);
-    	game.setSearchTime(100);
+    	game.setSearchPly(10);
     	game.initializeBoard();
-    	game.setHeuristicWeights(new double[]{500, 3, 5, 4, 2});
+    	game.setHeuristicWeights(new double[]{500, 3, 4, 1, 3});
     	
     	// debug printing
 		GameState gs = game.getGameState();

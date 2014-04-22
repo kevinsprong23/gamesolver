@@ -11,16 +11,16 @@ import java.util.ArrayList;
 public class ParamOptimizerThrees {
     public static void main( String[] args ) throws IOException {
     	// out file location
-    	String resultsFilePath = "ParameterSearchThreesRefine4.csv";
+    	String resultsFilePath = "ParameterSearchThreesInitial4.csv";
     	
     	// num sims per parameter setting
-    	int numTrials = 30;
+    	int numTrials = 10;
     	
     	// sim parameters
-    	double [] monoRange =  {3.5, 3.5, 1};
-    	double [] smoothRange =  {4, 4, 1};
-    	double [] checkerRange = {1, 1, 1};
-    	double [] openRange =  {3, 6.1, 0.5};
+    	double [] monoRange =  {1.5, 2.01, 0.5};
+    	double [] smoothRange =  {5, 6.01, 0.5};
+    	double [] checkerRange = {0, 0, 0.1};
+    	double [] openRange =  {2.0, 2.5, 0.5};
     	ArrayList<Double> monoVec = new ArrayList<Double>();
     	ArrayList<Double> smoothVec = new ArrayList<Double>();
     	ArrayList<Double> checkerVec = new ArrayList<Double>();
