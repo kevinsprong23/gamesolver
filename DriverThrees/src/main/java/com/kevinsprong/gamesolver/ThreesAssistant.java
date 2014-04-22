@@ -8,14 +8,16 @@ import java.util.Scanner;
  */
 public class ThreesAssistant {
     public static void main( String[] args ) {
+    	int[] userStack = {}; // to reset an existing game state
+    	
         // make a new game
     	Threes game = new Threes("AlphaBeta", "UserInput");
     	game.input = new Scanner(System.in);
-    	game.setSearchTime(200);
-    	game.setHeuristicWeights(new double[]{500, 4, 4, 1, 3});
+    	game.setSearchPly(10);
+    	game.setHeuristicWeights(new double[]{500, 3.5, 4, 1, 4});
     	
     	// manual init board
-    	System.out.print("Enter the initial board as comma separated integers");
+    	System.out.println("Enter the initial board as comma separated integers: ");
     	String boardStr = game.input.next();
     	String[] boardVals = boardStr.split(",");
     	int[][] userBoard = new int[4][4];
@@ -25,15 +27,21 @@ public class ThreesAssistant {
     	game.getGameState().setBoardState(userBoard);
     	
     	// now figure out game stack
-    	int[] numTilesInStack = {0,0,0}; // ones, twos, threes respectively	
-    	for (int[] row : userBoard) {
-    		for (int val: row) {
-    			if (val == 1) {
-    				numTilesInStack[0]++;
-    			} else if (val == 2) {
-    				numTilesInStack[1]++;
-    			} else if (val == 3) {
-    				numTilesInStack[2]++;			
+    	int[] numTilesInStack = new int[3]; // ones, twos, threes respectively	
+    	
+    	if (userStack.length > 0) {
+    		numTilesInStack = userStack;
+    	} else { // set one up off the initialized board
+    		numTilesInStack = new int[]{4,4,4};
+    		for (int[] row : userBoard) {
+    			for (int val: row) {
+    				if (val == 1) {
+    					numTilesInStack[0]--;
+    				} else if (val == 2) {
+    					numTilesInStack[1]--;
+    				} else if (val == 3) {
+    					numTilesInStack[2]--;			
+    				}
     			}
     		}
     	}
@@ -49,21 +57,22 @@ public class ThreesAssistant {
     		moveStack[9] = 1;
     	}
     	game.getGameState().setMoveStack(moveStack);
-    	
+
     	// debug printing
-		GameState gs = game.getGameState();
-		String prevMove = null;
-		if (gs.getPlayerToMove() == 2) { // since board has already been updated
+    	GameState gs = game.getGameState();
+    	String prevMove = null;
+    	if (gs.getPlayerToMove() == 2) { // since board has already been updated
     		prevMove = gs.getP1PreviousMove();
     	} else {
     		prevMove = gs.getP2PreviousMove();
     	}
-		System.out.println("Move " + gs.getMoveNum() + ", " + prevMove + ", board:");
-		System.out.println(Arrays.toString(gs.getBoardState()[0]));
-		System.out.println(Arrays.toString(gs.getBoardState()[1]));
-		System.out.println(Arrays.toString(gs.getBoardState()[2]));
-		System.out.println(Arrays.toString(gs.getBoardState()[3]));
-    	
+    	System.out.println("Move " + gs.getMoveNum() + ", " + prevMove + ", board:");
+    	System.out.println(Arrays.toString(gs.getBoardState()[0]));
+    	System.out.println(Arrays.toString(gs.getBoardState()[1]));
+    	System.out.println(Arrays.toString(gs.getBoardState()[2]));
+    	System.out.println(Arrays.toString(gs.getBoardState()[3]));
+
+
     	// play the game until there is a winner
     	int winStatus = game.determineWinner();
     	int prevTile = 0;
@@ -112,6 +121,7 @@ public class ThreesAssistant {
     		System.out.println(Arrays.toString(gs.getBoardState()[1]));
     		System.out.println(Arrays.toString(gs.getBoardState()[2]));
     		System.out.println(Arrays.toString(gs.getBoardState()[3]));
+    		System.out.println("Movestack: " + Arrays.toString(numTilesInStack));
     	}
     	game.input.close();
     	

@@ -3,7 +3,6 @@ package com.kevinsprong.gamesolver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Set;
@@ -445,12 +444,11 @@ public class Threes extends TwoPlayerGame {
 	    	// legal moves are the uniques of the moveStack or the bonusMoveList, to open tiles
 	    	// opposite P1's move
 	    	// parse moveStack
-	    	List<Integer> uniqueMoves = new ArrayList<Integer>();
+	    	HashSet<Integer> uniqueMoves = new HashSet<Integer>();
 	    	int[] moveStack = currentState.getMoveStack();
 	    	for (int j = 0; j < moveStack.length; j++) {
 	    		if (moveStack[j] > 0) {
 	    			uniqueMoves.add(moveStack[j]);
-	    			break;
 	    		}
 	    	}
 	   
