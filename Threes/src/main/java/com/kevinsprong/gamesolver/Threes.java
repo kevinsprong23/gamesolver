@@ -13,7 +13,7 @@ import java.util.Set;
  */
 public class Threes extends TwoPlayerGame {
 	// expose weights for tuning
-	private double[] heuristicWeights = {500, 2, 4, 1, 3};
+	private double[] heuristicWeights = {500, 3.5, 4, 1, 4};
 	public Scanner input;
 	
 	// getter and setter
