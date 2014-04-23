@@ -13,8 +13,7 @@ public class ThreesAssistant {
         // make a new game
     	Threes game = new Threes("AlphaBeta", "UserInput");
     	game.input = new Scanner(System.in);
-    	game.setSearchPly(10);
-    	game.setHeuristicWeights(new double[]{500, 2, 4, 0, 2});
+    	game.setSearchPly(7);
     	
     	// manual init board
     	System.out.println("Enter the initial board as comma separated integers: ");
@@ -91,7 +90,8 @@ public class ThreesAssistant {
         		prevMove = gs.getP2PreviousMove();
         		// we just entered their move; update our external 
         		// move stack and reset for accurate alpha beta calcs
-        		prevTile = Integer.parseInt(prevMove.substring(0, 1));
+        		String[] parsedMove = prevMove.split("_");
+        		prevTile = Integer.parseInt(parsedMove[0]);
         		if (prevTile <= 3) {
         			numTilesInStack[prevTile-1] -= 1;
         		}
