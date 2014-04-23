@@ -99,6 +99,11 @@ public abstract class TwoPlayerGame {
   	public void setWinCondition(int winConditionIn) {
   		this.winCondition= winConditionIn;
   	}
+  	
+	public String[] findLegalMovesExtended(GameState thisGS) {
+		// auto-generated method stub; override this in Threes
+		return null;
+	}
 }
 
 

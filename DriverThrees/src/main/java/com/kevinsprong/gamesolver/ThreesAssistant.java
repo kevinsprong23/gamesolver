@@ -8,7 +8,7 @@ import java.util.Scanner;
  */
 public class ThreesAssistant {
     public static void main( String[] args ) {
-    	int[] userStack = {}; // to reset an existing game state
+    	int[] userStack = {1,1,1}; // to reset an existing game state
     	
         // make a new game
     	Threes game = new Threes("AlphaBeta", "UserInput");

@@ -148,7 +148,7 @@ public class Threes extends TwoPlayerGame {
     	if (currentState.getPlayerToMove() == 1) { // dont toggle flag until we actually update the board in other func
     		
     		if (p1Strat.equals("AlphaBeta")) { // use AlphaBetaSolver
-    			currentState.setP1PreviousMove(AlphaBetaSolver.solveBoard(this));
+    			currentState.setP1PreviousMove(AlphaBetaThreesSolver.solveBoard(this));
     		} else if (p1Strat.equals("Random")) {
     			// copy game state so we dont overwrite any of it
     			GameState currentStateCopy = GameState.copyGameState(currentState);
@@ -162,8 +162,8 @@ public class Threes extends TwoPlayerGame {
     	} else {
     		if (p2Strat.equals("DefaultComputer")) { // choose a tile at random
     			
-    			// choose which number(s) we will get
-    	    	int pt1 = this.generateNewCell();
+    	    	// choose which number(s) we will get
+    	    	int pt1 = this.generateNewCell(this.getGameState().getNextMoveBonus());
     	    	
     	    	// find zero tiles on current board and their indices
     	    	ArrayList<int[]> zeroList = this.getValidComputerMoveTiles(currentState);
@@ -174,7 +174,19 @@ public class Threes extends TwoPlayerGame {
     	        int pt1x = zeroList.get(randomNum1)[1];
     	        
     	        // instead of return statement
-    	        currentState.setP2PreviousMove(Integer.toString(pt1) + "_" + Integer.toString(pt1y) + "_" + Integer.toString(pt1x));          
+    	        currentState.setP2PreviousMove(Integer.toString(pt1) + "_" + Integer.toString(pt1y) + "_" + Integer.toString(pt1x));    
+    	        
+    	        // now that move has been chosen:  
+    	        // roll to see if next move is a bonus
+    	        int rand = this.randIntInRange(1,21);
+    	    	int maxTile = this.getMaxTile(this.getGameState());
+    	    	// 1/21 to return a bonus tile
+    	    	if (rand == 1 && maxTile >= 48) {
+    	    		this.getGameState().setNextMoveBonus(true);
+    	    	} else {
+    	    		this.getGameState().setNextMoveBonus(false);
+    	    	}
+    	        
     		} else if (p2Strat.equals("UserInput")) { // prompt user for the phone move
     			System.out.print("Enter the computer's move as tile_rowidx_colidx: ");
     			currentState.setP2PreviousMove(this.input.next());  
@@ -469,7 +481,42 @@ public class Threes extends TwoPlayerGame {
     	// convert array list into array of strings
     	return legalMoveList.toArray(new String[legalMoveList.size()]);
     }
-    
+    // version that can be called by alpha beta solver with knowledge of next move,
+    // always for computer player
+    // override the stub found in TwoPlayerGame
+    @Override 
+    public String[] findLegalMovesExtended(GameState gameStateIn) {
+    	
+    	GameState currentState = GameState.copyGameState(gameStateIn);
+
+    	ArrayList<String> legalMoveList = new ArrayList<String>();
+
+    	// computer player
+    	// get the valid move tiles
+    	ArrayList<int[]> zeroList = this.getValidComputerMoveTiles(currentState);
+
+    	// legal moves are top of the moveStack or the bonusMoveList, 
+    	// since we know the next move in this case
+    	int[] legalMoveTiles;
+    	if (currentState.getNextMoveBonus()) {
+    		legalMoveTiles = findBonusMoves(currentState);
+    	} else {
+    		int nextCard = this.peekAtMoveStack(currentState);
+    		legalMoveTiles = new int[]{nextCard};		 		
+    	}
+    	// build list of moves
+    	for (int tile : legalMoveTiles) { // yay auto-unboxing
+    		for (int[] pos : zeroList) {
+    			legalMoveList.add(Integer.toString(tile) + "_" + 
+    					Integer.toString(pos[0]) + "_" + 
+    					Integer.toString(pos[1]));
+    		}
+    	}
+
+
+    	// convert array list into array of strings
+    	return legalMoveList.toArray(new String[legalMoveList.size()]);
+    }
     private ArrayList<int[]> getValidComputerMoveTiles(GameState gsIn) {
     	ArrayList<int[]> zeroList = new ArrayList<int[]>();
     	
@@ -887,34 +934,57 @@ public class Threes extends TwoPlayerGame {
     
     
 	// generate new tile for the game
-    public int generateNewCell() {
-    	int rand = this.randIntInRange(1,21);
-    	int maxTile = this.getMaxTile(this.getGameState());
+    public int generateNewCell(boolean bonusCard) {
+    	
     	int output = 0;
     	// 1/21 to return a bonus tile
     	
-    	if (rand == 1 && maxTile >= 48) {
+    	if (bonusCard) {
     		int[] bonusMoves = this.findBonusMoves();
     		int bidx = randIntInRange(0, bonusMoves.length-1);
     		output = bonusMoves[bidx];
     	} else { // 20/21 to return first non-zero tile in moveStack
-    		// find first non-zero tile of moveStack
-    		int [] moveStack = this.getGameState().getMoveStack();
-    		for (int i = 0; i < moveStack.length; i++) {
-    			if (moveStack[i] > 0) {
-    				output = moveStack[i];
-    				break;
-    			}
-    		}
+    		output = this.peekAtMoveStack(this.getGameState());
     	}
     	return output;
     }
     
+    public int peekAtMoveStack(GameState gsIn) {
+    	// find first non-zero tile of moveStack
+    	int output = 0;
+    	int [] moveStack = gsIn.getMoveStack();
+    	for (int i = 0; i < moveStack.length; i++) {
+    		if (moveStack[i] > 0) {
+    			output = moveStack[i];
+    			break;
+    		}
+    	}
+    	return output;
+    }
+
     public int[] findBonusMoves() {
     	int bonusTiles[] = {};
     	
     	// find max tile
     	int maxTile = this.getMaxTile(this.getGameState());
+    	if (maxTile >= 48) {
+    		// return all multiples of 6 that are between 6 and maxTile/8
+    		int maxTileMult = (int) logb(maxTile / 8 / 3, 2);
+    		bonusTiles = new int[maxTileMult];
+    		for (int i = 1; i <= maxTileMult; i++) {
+    			bonusTiles[i-1] = 3 * (int) Math.pow(2, i);
+    		}
+    		
+    	}
+    	
+    	return bonusTiles;
+    }
+    
+    public int[] findBonusMoves(GameState gameStateIn) {
+    	int bonusTiles[] = {};
+    	
+    	// find max tile
+    	int maxTile = this.getMaxTile(gameStateIn);
     	if (maxTile >= 48) {
     		// return all multiples of 6 that are between 6 and maxTile/8
     		int maxTileMult = (int) logb(maxTile / 8 / 3, 2);

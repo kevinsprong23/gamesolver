@@ -1,0 +1,116 @@
+package com.kevinsprong.gamesolver;
+
+/**
+ * Module to perform Alpha Beta Pruning to find the next move in a TwoPlayerGame
+ */
+public class AlphaBetaThreesSolver {
+	
+	public static String solveBoard(TwoPlayerGame game) {
+		String bestMove = "";
+		
+		// get the game state and solver parameters
+		GameState currentGameState = GameState.copyGameState(game.getGameState());
+		int searchPly = game.getSearchPly();
+		int searchTime = game.getSearchTime();
+		
+		// iddfs algorithm, or fixed ply, depending on param values
+		int thisPly = 0;
+		long startTime = System.nanoTime();
+		long endTime = 0;
+		int timeElapsed = 0;
+		MoveNode originNode = null;
+		double moveEval = 0;
+		
+		while (timeElapsed < searchTime && thisPly < searchPly) {
+			// solve it
+			thisPly += 1;
+			originNode = new MoveNode(currentGameState, thisPly);
+			moveEval = alphaBeta(game, originNode, thisPly, thisPly, true);
+			
+			// time it
+			endTime = System.nanoTime();
+			timeElapsed = (int) ((int) (endTime - startTime) / 1e6);
+		}
+		// find the move that produced the best evaluation
+		for (MoveNode child : originNode.getNodeChildren()) {
+			if (child.getBeta() == moveEval) {
+				bestMove = child.getMoveName();
+				break;
+			}
+		}
+		game.getGameState().setGameEval(moveEval);
+		
+		return bestMove;
+	}		
+
+	private static double alphaBeta(TwoPlayerGame game, MoveNode thisNode, 
+			int searchPly, int maxPly, boolean maximizingPlayer) {
+		
+		// get the moveNode's game state
+		GameState thisGS = thisNode.getNodeGameState();
+		
+		// if searchPly is 0 or there is a winner, return game evaluation
+		if ((searchPly == 0) || 
+				(game.determineWinner(GameState.copyGameState(thisGS)) != 0) ){
+			double eval = game.evaluateGameState(thisGS);
+			if (maximizingPlayer) {
+				thisNode.setAlpha(eval);
+			} else {
+				thisNode.setBeta(eval);
+			}
+			return eval;
+		}
+
+		// else set up Node Tree for legal moves
+		GameState nextGS;
+		MoveNode newChild;
+		String[] legalMoves;
+		if (searchPly == maxPly - 1) { 
+			// then it's the computer's first response in the tree and we 
+			// have (semi) perfect knowledge of next move	
+			legalMoves = game.findLegalMovesExtended(thisGS);
+		} else {
+			legalMoves = game.findLegalMoves(thisGS);
+		}
+		for (String move : legalMoves) {
+			nextGS = GameState.copyGameState(thisGS);
+			nextGS.setNextMoveBonus(thisGS.getNextMoveBonus() && 
+					searchPly == maxPly); // only propagate for first move
+			nextGS = game.calcUpdatedGameState(nextGS, move);
+			nextGS.setPlayerToMove((nextGS.getPlayerToMove() % 2) + 1);
+			newChild = new MoveNode(nextGS, searchPly-1, move);
+			thisNode.getNodeChildren().add(newChild);
+		}
+		
+		// get alpha and beta
+		double alpha = thisNode.getAlpha();
+		double beta = thisNode.getBeta();
+		
+		// loop over children and return 
+		if (maximizingPlayer) {
+			for (MoveNode child : thisNode.getNodeChildren()) {
+				child.setAlpha(thisNode.getAlpha());
+				child.setBeta(thisNode.getBeta());
+				alpha = Math.max(alpha, alphaBeta(game, child, searchPly-1, maxPly, false));
+				thisNode.setAlpha(alpha);
+				if (alpha >= beta) {
+					break;
+				}
+			}	
+			return alpha;
+		} else { // minimizing player
+			for (MoveNode child : thisNode.getNodeChildren()) {
+				child.setAlpha(thisNode.getAlpha());
+				child.setBeta(thisNode.getBeta());
+				beta = Math.min(beta, alphaBeta(game, child, searchPly-1, maxPly, true));
+				thisNode.setBeta(beta);
+				if (alpha >= beta) {
+					break;
+				}
+			}
+			return beta;
+		}
+
+	}
+
+}

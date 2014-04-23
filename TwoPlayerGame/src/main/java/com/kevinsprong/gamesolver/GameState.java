@@ -15,6 +15,7 @@ public class GameState {
     private double moveNum = 0;
     private int[] moveStack; // array instead of list for controlled ordered access
     private int[] idxShift; // whether column/row moved last time
+    private boolean nextMoveBonus = false; // whether next move is a bonus move
     
     //constructor
     public GameState() {
@@ -47,6 +48,8 @@ public class GameState {
     	gsOut.setGameEval(gameStateIn.getGameEval()); 
     	gsOut.setGameScore(gameStateIn.getGameScore()); 
     	gsOut.setMoveNum(gameStateIn.getMoveNum()); 
+    	gsOut.setNextMoveBonus(gameStateIn.getNextMoveBonus());
+    	
     	// deep copy of move stack
     	int[] moveStackOld = gameStateIn.getMoveStack();
     	if (moveStackOld.length > 0) {
@@ -137,5 +140,12 @@ public class GameState {
    		for (int i = 0; i < idxShiftIn.length; i++) {
    			this.idxShift[i] = idxShiftIn[i];
    		}
+   	}
+   	// get set for nextMoveBonus
+   	public boolean getNextMoveBonus() {
+   		return this.nextMoveBonus;
+   	}
+   	public void setNextMoveBonus(boolean a) {
+   		this.nextMoveBonus = a;
    	}
 }
