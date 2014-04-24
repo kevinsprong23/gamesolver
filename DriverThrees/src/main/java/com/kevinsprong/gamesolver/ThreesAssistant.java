@@ -8,12 +8,12 @@ import java.util.Scanner;
  */
 public class ThreesAssistant {
     public static void main( String[] args ) {
-    	int[] userStack = {1,1,1}; // to reset an existing game state
+    	int[] userStack = {}; // to reset an existing game state
     	
         // make a new game
     	Threes game = new Threes("AlphaBeta", "UserInput");
     	game.input = new Scanner(System.in);
-    	game.setSearchPly(7);
+    	game.setSearchPly(10);
     	
     	// manual init board
     	System.out.println("Enter the initial board as comma separated integers: ");
