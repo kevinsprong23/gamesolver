@@ -55,6 +55,12 @@ public class ThreesAssistant {
     	if (numTilesInStack[0] > 0) {
     		moveStack[9] = 1;
     	}
+    	// enter next move for branching factor reduction
+    	System.out.print("Enter the next move as an integer: 1,2,3: ");
+    	int nextMove = Integer.parseInt(game.input.next());
+    	System.out.print(System.getProperty("line.separator"));
+    	moveStack[0] = nextMove;
+    	
     	game.getGameState().setMoveStack(moveStack);
 
     	// debug printing
@@ -95,6 +101,7 @@ public class ThreesAssistant {
         		if (prevTile <= 3) {
         			numTilesInStack[prevTile-1] -= 1;
         		}
+        		
         		// update our moveStack if we lose tile possibilities
         		for (int i = 0; i < 3; i++) {
         			if (numTilesInStack[i] == 0) {
@@ -110,10 +117,23 @@ public class ThreesAssistant {
         			numTilesInStack[0] = 4;
         			numTilesInStack[1] = 4;
         			numTilesInStack[2] = 4;
+        			moveStack[0] = 0;
         			moveStack[9] = 1;
         			moveStack[10] = 2;
         			moveStack[11] = 3;
         		}
+        		
+        		// now that stack has been updated, show next move
+        		System.out.print("Enter the displayed next move as an integer: 1,2,3, or 7 for bonus: ");
+            	nextMove = Integer.parseInt(game.input.next());
+            	System.out.print(System.getProperty("line.separator"));
+            	if (nextMove == 7) {
+            		game.getGameState().setNextMoveBonus(true);
+            	} else {
+            		game.getGameState().setNextMoveBonus(false);
+            		moveStack[0] = nextMove;
+            	}
+        		
         		game.getGameState().setMoveStack(moveStack);    
         	}
     		System.out.println("Move " + gs.getMoveNum() + ", " + prevMove + ", board:");
