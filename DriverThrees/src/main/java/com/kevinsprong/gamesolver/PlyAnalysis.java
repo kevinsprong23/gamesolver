@@ -17,7 +17,7 @@ public class PlyAnalysis {
 		int numTrials = 30;
 
 		// sim parameters
-		int [] plyRange = {0, 9, 1};
+		int [] plyRange = {0, 12, 1};
 
 		ArrayList<Integer> plyVec = new ArrayList<Integer>();
 
@@ -32,6 +32,7 @@ public class PlyAnalysis {
 		int winStatus;
 		int highTile;
 		double score;
+		double highScore;
 		double moveNum;
 
 		// variables to hold sim results
@@ -53,7 +54,7 @@ public class PlyAnalysis {
 		FileWriter writer = new FileWriter(resultsFile);
 		// print header
 		String newline = System.getProperty("line.separator");
-		writer.write("searchPly,avgWinPct,avgBigWinPct,avgHighTile,highTile,avgScore,avgMoveNum" +
+		writer.write("searchPly,avgWinPct,avgBigWinPct,avgHighTile,highTile,highScore,avgScore,avgMoveNum" +
 				newline);
 
 		// loop to optimize parameters
@@ -65,6 +66,7 @@ public class PlyAnalysis {
 
 			// reset results vectors
 			highestTile = 0;
+			highScore = 0;
 			winRecord = new int[numTrials];
 			bigWinRecord = new int[numTrials];
 			highTiles = new int[numTrials];
@@ -106,6 +108,9 @@ public class PlyAnalysis {
 				if (highTile > highestTile) {
 					highestTile = highTile;
 				}
+				if (score > highScore) {
+					highScore = score;
+				}
 				scores[k] = (int) score;
 				highTiles[k] = highTile;
 				moveNums[k] = (int) moveNum;
@@ -135,6 +140,7 @@ public class PlyAnalysis {
 							Double.toString(bigWinPct) + "," +
 							Double.toString(avgHighTile) + "," +
 							Integer.toString(highestTile) + "," +
+							Double.toString(highScore) + "," +
 							Double.toString(avgScore) + "," +
 							Double.toString(avgMoveNum) + newline
 					);
