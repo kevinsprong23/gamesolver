@@ -1,8 +1,5 @@
 gamesolver
 ==========
 
-Code to run alpha beta algorithms against two-person games
+Code to run alpha beta algorithms against the mobile games Threes! and 2048
 
-Blog post: [kevinsprong.com](http://kevinsprong.com/posts/2014/04/23/threes-vs-2048/)
-
-Slides: [kevinsprong.com](http://kevinsprong.com/projects/gamesolver/)
